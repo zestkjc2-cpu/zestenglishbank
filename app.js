@@ -49,6 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Search Functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+
+    function performSearch() {
+        if(searchInput && searchInput.value.trim() !== '') {
+            const query = encodeURIComponent(searchInput.value.trim());
+            window.location.href = `https://www.google.com/search?q=${query}`;
+        }
+    }
+
+    if(searchBtn) {
+        searchBtn.addEventListener('click', performSearch);
+    }
+
+    if(searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    }
+
     // Ticker Logic
     const tickerList = document.getElementById('noticeTicker');
     if (tickerList) {
