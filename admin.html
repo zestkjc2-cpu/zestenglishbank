@@ -153,6 +153,15 @@
         });
 
         // File Upload to Supabase Storage
+        function sanitizeFileName(name) {
+            return name
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9._\-]/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+        }
+
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             uploadStatus.textContent = '업로드 중...';
@@ -168,7 +177,8 @@
                 return;
             }
 
-            const filePath = `${category}/${Date.now()}_${file.name}`;
+            const safeName = sanitizeFileName(file.name);
+            const filePath = `${category}/${Date.now()}_${safeName}`;
 
             // Upload to Storage
             const { error: storageError } = await supabase.storage

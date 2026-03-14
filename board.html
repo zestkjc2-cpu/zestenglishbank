@@ -174,6 +174,15 @@
         });
 
         // File Upload
+        function sanitizeFileName(name) {
+            return name
+                .normalize('NFD') // decompose Unicode
+                .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+                .replace(/[^a-zA-Z0-9._\-]/g, '_') // replace other special chars with _
+                .replace(/_+/g, '_') // collapse multiple underscores
+                .replace(/^_|_$/g, ''); // trim leading/trailing underscores
+        }
+
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const statusEl = document.getElementById('uploadStatus');
@@ -190,7 +199,8 @@
                 return;
             }
 
-            const filePath = `${category}/${Date.now()}_${file.name}`;
+            const safeName = sanitizeFileName(file.name);
+            const filePath = `${category}/${Date.now()}_${safeName}`;
 
             const { error: storageError } = await supabase.storage
                 .from('documents').upload(filePath, file);
