@@ -4,101 +4,70 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>제스트 영어 문제은행 - 게시판</title>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     <style>
         .board-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: var(--shadow-lg);
+            max-width: 1000px; margin: 0 auto; background: var(--surface);
+            border-radius: 16px; padding: 30px; box-shadow: var(--shadow-lg);
         }
-
         .board-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border);
+            flex-wrap: wrap; gap: 10px;
         }
-
-        .board-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .board-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        .board-table th, .board-table td {
-            padding: 16px 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .board-table th {
-            background: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .board-table td.title-cell {
-            text-align: left;
-            font-weight: 500;
-            color: var(--text-main);
-        }
-
-        .board-table tr:hover {
-            background: #f1f5f9;
-        }
-
+        .board-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .board-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .board-table th, .board-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); }
+        .board-table th { background: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; }
+        .board-table td.title-cell { text-align: left; font-weight: 500; color: var(--text-main); }
+        .board-table tr:hover { background: #f1f5f9; }
         .download-btn {
-            background: var(--surface);
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+            background: var(--surface); border: 1px solid var(--primary); color: var(--primary);
+            padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
         }
-
-        .download-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .badge-type {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 8px;
-        }
-
+        .download-btn:hover { background: var(--primary); color: white; }
+        .badge-type { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 8px; }
         .badge-hwp { background: #e0f2fe; color: #0284c7; }
         .badge-pdf { background: #fee2e2; color: #dc2626; }
+        .badge-docx { background: #f3e8ff; color: #7c3aed; }
+        .loading-msg { text-align: center; padding: 40px; color: var(--text-muted); }
 
+        /* Admin Upload Panel */
+        .admin-upload-panel {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1.5px solid var(--primary);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 28px;
+        }
+        .admin-upload-panel h3 { margin-bottom: 16px; font-size: 1.1rem; color: var(--primary); }
+        .upload-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .upload-row input[type="text"],
+        .upload-row select,
+        .upload-row input[type="file"] {
+            flex: 1; min-width: 160px; padding: 10px 12px;
+            border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.95rem; background: white; color: var(--text-main);
+        }
+        .status-msg { margin-top: 10px; font-size: 0.9rem; font-weight: 600; }
+        .status-msg.ok { color: #16a34a; }
+        .status-msg.err { color: #dc2626; }
+        .admin-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 16px; background: #dbeafe; border-radius: 8px;
+            margin-bottom: 16px; font-size: 0.9rem; color: var(--primary); font-weight: 600;
+        }
+        .admin-bar button { font-size: 0.8rem; padding: 4px 12px; }
     </style>
 </head>
 <body style="background: var(--bg-color);">
     <header class="header">
         <div class="container nav-container">
-            <a href="index.html" class="brand-logo">
-                <span class="zest-brand">ZEST ENGLISH BANK</span>
-            </a>
+            <a href="index.html" class="brand-logo"><span class="zest-brand">ZEST ENGLISH BANK</span></a>
             <nav class="main-nav">
                 <ul class="nav-list">
                     <li><a href="trial.html" class="nav-link">자료실로 돌아가기</a></li>
@@ -110,11 +79,40 @@
     <section style="padding-top: 150px; min-height: 100vh;">
         <div class="container">
             <div class="board-container">
+
+                <!-- Admin bar (visible when logged in) -->
+                <div class="admin-bar" id="adminBar" style="display:none;">
+                    <span id="adminBarEmail">👤 관리자 모드</span>
+                    <button class="btn btn-outline" id="logoutBtn">로그아웃</button>
+                </div>
+
+                <!-- Admin Upload Panel (visible when logged in) -->
+                <div class="admin-upload-panel" id="adminUploadPanel" style="display:none;">
+                    <h3>📤 자료 업로드 (관리자)</h3>
+                    <form id="uploadForm">
+                        <div class="upload-row">
+                            <input type="text" id="fileTitle" placeholder="제목을 입력하세요" required>
+                            <select id="fileCategory" required>
+                                <option value="">카테고리 선택</option>
+                                <option value="Vocabulary">어휘자료</option>
+                                <option value="School">내신정복</option>
+                                <option value="Mistakes">최다오답15</option>
+                                <option value="Mock">모의고사</option>
+                                <option value="Middle">중등교과서</option>
+                                <option value="High">고등교과서</option>
+                            </select>
+                            <input type="file" id="fileInput" accept=".pdf,.hwp,.docx" required>
+                            <button type="submit" class="btn btn-gradient">업로드</button>
+                        </div>
+                        <p id="uploadStatus" class="status-msg"></p>
+                    </form>
+                </div>
+
                 <div class="board-header">
-                    <div class="board-title" id="boardCategoryTitle">게시판 자료실</div>
-                    <div class="board-search">
-                        <input type="text" placeholder="문서 검색..." style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;">
-                        <button class="btn btn-gradient" style="padding: 8px 16px;">검색</button>
+                    <div class="board-title" id="boardCategoryTitle">자료실 게시판</div>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="searchInput" placeholder="문서 검색..." style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                        <button class="btn btn-gradient" style="padding: 8px 16px;" id="searchBtn">검색</button>
                     </div>
                 </div>
 
@@ -122,56 +120,139 @@
                     <thead>
                         <tr>
                             <th width="8%">번호</th>
-                            <th width="60%">제목</th>
-                            <th width="12%">등록일</th>
-                            <th width="20%">다운로드</th>
+                            <th width="55%">제목</th>
+                            <th width="15%">등록일</th>
+                            <th width="22%">다운로드</th>
                         </tr>
                     </thead>
                     <tbody id="boardContent">
-                        <!-- Content populated by JS -->
+                        <tr><td colspan="4" class="loading-msg">📂 자료를 불러오는 중...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </section>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const categoryMap = {
-                'Vocabulary': '어휘자료',
-                'School': '내신정복',
-                'Mistakes': '최다오답15',
-                'Mock': '모의고사',
-                'Middle': '중등교과서',
-                'High': '고등교과서'
-            };
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
 
-            const catKey = urlParams.get('category') || 'Vocabulary';
-            const catName = categoryMap[catKey] || '자료실';
-            
-            document.getElementById('boardCategoryTitle').innerText = `${catName} 게시판`;
+        const categoryMap = {
+            'Vocabulary': '어휘자료', 'School': '내신정복', 'Mistakes': '최다오답15',
+            'Mock': '모의고사', 'Middle': '중등교과서', 'High': '고등교과서'
+        };
 
-            // Generate mock data
+        const urlParams = new URLSearchParams(window.location.search);
+        const catKey = urlParams.get('category') || '';
+        const catName = categoryMap[catKey] || '전체 자료';
+        document.getElementById('boardCategoryTitle').innerText = catName + ' 게시판';
+
+        // Pre-select category in upload form if category is in URL
+        const fileCategoryEl = document.getElementById('fileCategory');
+        if (catKey && fileCategoryEl) fileCategoryEl.value = catKey;
+
+        // Check if admin is logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            document.getElementById('adminBar').style.display = 'flex';
+            document.getElementById('adminBarEmail').textContent = '👤 관리자: ' + session.user.email;
+            document.getElementById('adminUploadPanel').style.display = 'block';
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            document.getElementById('adminBar').style.display = 'none';
+            document.getElementById('adminUploadPanel').style.display = 'none';
+        });
+
+        // File Upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusEl = document.getElementById('uploadStatus');
+            statusEl.textContent = '업로드 중...';
+            statusEl.className = 'status-msg';
+
+            const title = document.getElementById('fileTitle').value.trim();
+            const category = document.getElementById('fileCategory').value;
+            const file = document.getElementById('fileInput').files[0];
+
+            if (!title || !category || !file) {
+                statusEl.textContent = '모든 항목을 입력해주세요.';
+                statusEl.className = 'status-msg err';
+                return;
+            }
+
+            const filePath = `${category}/${Date.now()}_${file.name}`;
+
+            const { error: storageError } = await supabase.storage
+                .from('documents').upload(filePath, file);
+
+            if (storageError) {
+                statusEl.textContent = '저장 오류: ' + storageError.message;
+                statusEl.className = 'status-msg err';
+                return;
+            }
+
+            const { error: dbError } = await supabase.from('files')
+                .insert({ title, category, file_path: filePath });
+
+            if (dbError) {
+                statusEl.textContent = 'DB 오류: ' + dbError.message;
+                statusEl.className = 'status-msg err';
+            } else {
+                statusEl.textContent = '✅ 업로드 완료!';
+                statusEl.className = 'status-msg ok';
+                document.getElementById('uploadForm').reset();
+                if (catKey) fileCategoryEl.value = catKey;
+                await loadFiles();
+            }
+        });
+
+        // Load Files from Supabase
+        async function loadFiles(searchTerm = '') {
             const tbody = document.getElementById('boardContent');
-            for(let i=1; i<=5; i++) {
-                const tr = document.createElement('tr');
-                const isPdf = i % 2 === 0;
-                const badgeClass = isPdf ? 'badge-pdf' : 'badge-hwp';
-                const badgeText = isPdf ? 'PDF' : 'HWP';
+            tbody.innerHTML = '<tr><td colspan="4" class="loading-msg">📂 자료를 불러오는 중...</td></tr>';
 
-                let titleExt = isPdf ? '최종_문제지.pdf' : '학습지_원본.hwp';
-                
+            let query = supabase.from('files').select('*').order('created_at', { ascending: false });
+            if (catKey) query = query.eq('category', catKey);
+            if (searchTerm) query = query.ilike('title', `%${searchTerm}%`);
+
+            const { data, error } = await query;
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="loading-msg" style="color:red;">오류: ${error.message}</td></tr>`;
+                return;
+            }
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="loading-msg">등록된 자료가 없습니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach((file, i) => {
+                const ext = file.file_path.split('.').pop().toLowerCase();
+                const badgeClass = ext === 'pdf' ? 'badge-pdf' : ext === 'hwp' ? 'badge-hwp' : 'badge-docx';
+                const date = new Date(file.created_at).toLocaleDateString('ko-KR');
+                const { data: urlData } = supabase.storage.from('documents').getPublicUrl(file.file_path);
+
+                const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${6 - i}</td>
-                    <td class="title-cell"><span class="badge-type ${badgeClass}">${badgeText}</span> [${catName}] 제 ${6-i}회차 기출 예상문제 모음</td>
-                    <td>2026-03-${10 + i}</td>
-                    <td>
-                        <button class="download-btn" onclick="alert('${catName} 문서를 다운로드합니다.')">↓ 다운로드</button>
-                    </td>
+                    <td>${data.length - i}</td>
+                    <td class="title-cell"><span class="badge-type ${badgeClass}">${ext.toUpperCase()}</span>${file.title}</td>
+                    <td>${date}</td>
+                    <td><a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a></td>
                 `;
                 tbody.appendChild(tr);
-            }
+            });
+        }
+
+        loadFiles();
+
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            loadFiles(document.getElementById('searchInput').value.trim());
+        });
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loadFiles(e.target.value.trim());
         });
     </script>
 </body>
