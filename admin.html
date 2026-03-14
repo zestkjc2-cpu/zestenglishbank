@@ -139,7 +139,8 @@
             if (error) {
                 adminError.textContent = '로그인 실패: ' + error.message;
             } else {
-                showUploadPanel(data.user.email);
+                // Redirect to resource room (trial page) as admin
+                window.location.href = 'trial.html';
             }
         });
 
