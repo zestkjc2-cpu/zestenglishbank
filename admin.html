@@ -144,6 +144,14 @@
             }
         });
 
+        // Auto-fill title from filename
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const titleEl = document.getElementById('fileTitle');
+            if (e.target.files[0] && !titleEl.value.trim()) {
+                titleEl.value = e.target.files[0].name.replace(/\.[^.]+$/, '');
+            }
+        });
+
         // File Upload to Supabase Storage
         uploadForm.addEventListener('submit', async (e) => {
             e.preventDefault();

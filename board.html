@@ -150,6 +150,14 @@
         const fileCategoryEl = document.getElementById('fileCategory');
         if (catKey && fileCategoryEl) fileCategoryEl.value = catKey;
 
+        // Auto-fill title from filename
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const titleEl = document.getElementById('fileTitle');
+            if (e.target.files[0] && !titleEl.value.trim()) {
+                titleEl.value = e.target.files[0].name.replace(/\.[^.]+$/, '');
+            }
+        });
+
         // Check if admin is logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
