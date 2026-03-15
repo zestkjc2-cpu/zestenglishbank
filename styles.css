@@ -792,6 +792,11 @@ form .btn {
 
 /* Base Responsive Typography & Spacing */
 @media (max-width: 768px) {
+    /* Add ~0.5cm side padding on mobile (approx 15px-20px) */
+    .container {
+        padding: 0 15px; 
+    }
+
     .hero-section {
         padding: 120px 0 60px;
     }
@@ -801,12 +806,17 @@ form .btn {
     }
     
     .hero-actions {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
         width: 100%;
+        gap: 12px;
     }
     
     .hero-actions .btn {
-        width: 100%;
+        width: 66%;
+        padding: 10px 16px;
+        font-size: 0.95rem;
     }
 
     .notice-ticker-container {
