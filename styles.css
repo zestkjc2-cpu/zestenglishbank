@@ -840,9 +840,13 @@ form .btn {
 
     /* Search Box Container on Mobile (4/5 width = 80%) */
     .search-box-container {
-        width: 80%;
-        margin: 0 auto;
-        padding: 40px 20px !important;
+        width: 84%; /* Slight bump to width to make room for the button */
+        margin: 0 auto 0 -2%; /* Shift slightly left */
+        padding: 40px 15px !important;
+    }
+    
+    .search-box-container h3 {
+        font-size: 1.4rem !important;
     }
 
     /* Modal Adjustments */
