@@ -72,7 +72,7 @@
         <div class="container">
             <div class="section-header text-center">
 
-                <h2 class="section-title">제스트 자료실</h2>
+                <h2 class="section-title">자료실</h2>
                 <p class="section-desc">제스트 영어 은행의 학습 자료와 문제들을 다운로드 받으실 수 있습니다.</p>
             </div>
             
@@ -86,5 +86,36 @@
             </div>
         </div>
     </section>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            const trialBtns = document.querySelectorAll('.trial-page-btn');
+            trialBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (!session) {
+                        e.preventDefault();
+                        alert('로그인이 필요한 서비스입니다.');
+                        window.location.href = 'admin.html';
+                    }
+                });
+            });
+
+            // Also check '사용매뉴얼' link in header
+            const manualLink = document.querySelector('a[href*="category=Manual"]');
+            if (manualLink) {
+                manualLink.addEventListener('click', (e) => {
+                    if (!session) {
+                        e.preventDefault();
+                        alert('로그인이 필요한 서비스입니다.');
+                        window.location.href = 'admin.html';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
