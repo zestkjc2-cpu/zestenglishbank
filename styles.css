@@ -1143,6 +1143,11 @@ form .btn {
         font-size: 2rem;
     }
 
+    .features-grid {
+        width: 50%;
+        margin: 0 auto;
+    }
+
     /* Trial Grid */
     .trial-grid {
         grid-template-columns: 1fr;
