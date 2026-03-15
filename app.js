@@ -241,5 +241,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 3000);
         }
+
+        // Click logic for ticker items
+        tickerList.addEventListener('click', async (e) => {
+            const li = e.target.closest('li');
+            if (!li) return;
+
+            const category = li.getAttribute('data-category');
+            if (!category) return;
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                window.location.href = `board.html?category=${category}`;
+            } else {
+                const loginModal = document.getElementById('loginModal');
+                if (loginModal) {
+                    alert('로그인이 필요한 서비스입니다.');
+                    loginModal.classList.add('active');
+                }
+            }
+        });
     }
 });
