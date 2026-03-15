@@ -36,6 +36,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ── Session Check & Logout Logic ──────────────────────────────────────
+    async function checkSession() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        const updateBtn = (btn, text, isLogout = false) => {
+            if (!btn) return;
+            if (isLogout) {
+                btn.innerHTML = text;
+                btn.onclick = async (e) => {
+                    e.preventDefault();
+                    const { error } = await supabase.auth.signOut();
+                    if (error) alert('로그아웃 오류: ' + error.message);
+                    else window.location.reload();
+                };
+            } else {
+                btn.innerHTML = text;
+            }
+        };
+
+        if (session) {
+            // Change Nav Login to Logout
+            updateBtn(loginBtn, 'Logout', true);
+            // Change Hero Login to Logout
+            updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
+        }
+    }
+
+    checkSession();
+
     // Close on overlay click
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
@@ -81,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 if(loginError) loginError.textContent = '로그인 실패: ' + error.message;
             } else {
-                window.location.href = 'dashboard.html';
+                window.location.reload();
             }
         });
     }
@@ -108,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginGoogle.addEventListener('click', async () => {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin + '/dashboard.html' }
+                options: { redirectTo: window.location.origin + '/index.html' }
             });
             if(error) alert('구글 로그인 오류: ' + error.message);
         });
