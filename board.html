@@ -69,6 +69,11 @@
             text-decoration: none;
         }
         .delete-btn:hover { background: #e11d48; color: white; border-color: #e11d48; }
+        .lock-btn {
+            background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;
+            padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; text-decoration: none; display: inline-block;
+        }
     </style>
 </head>
 <body style="background: var(--bg-color);">
@@ -284,12 +289,15 @@
                 const { data: urlData } = supabase.storage.from('documents').getPublicUrl(file.file_path);
 
                 const tr = document.createElement('tr');
-                let actionHtml = `<a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a>`;
+                let actionHtml = '';
                 let checkHtml = '';
                 
                 if (session) {
+                    actionHtml = `<a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a>`;
                     actionHtml += ` <button class="delete-btn" onclick="window.deleteFile('${file.id}', '${file.file_path}')">삭제</button>`;
                     checkHtml = `<td><input type="checkbox" class="file-check" data-id="${file.id}" data-path="${file.file_path}"></td>`;
+                } else {
+                    actionHtml = `<button class="lock-btn" onclick="alert('관리자 로그인이 필요한 서비스입니다.'); window.location.href='admin.html';">🔒 로그인 후 다운로드</button>`;
                 }
 
                 tr.innerHTML = `
