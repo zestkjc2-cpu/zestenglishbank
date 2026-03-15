@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeModals.forEach(btn => {
         btn.addEventListener('click', () => {
-            closeModal(loginModal);
+             const modal = btn.closest('.modal-overlay');
+             closeModal(modal);
         });
     });
 
@@ -128,12 +129,61 @@ document.addEventListener('DOMContentLoaded', () => {
     // Search Functionality
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
+    const searchResultsModal = document.getElementById('searchResultsModal');
+    const searchResultsContent = document.getElementById('searchResultsContent');
+    const searchCount = document.getElementById('searchCount');
 
-    function performSearch() {
-        if(searchInput && searchInput.value.trim() !== '') {
-            const query = encodeURIComponent(searchInput.value.trim());
-            window.location.href = `https://www.google.com/search?q=${query}`;
+    async function performSearch() {
+        if (!searchInput || searchInput.value.trim() === '') return;
+        
+        const term = searchInput.value.trim();
+        searchCount.textContent = `'${term}' 검색 중...`;
+        searchResultsContent.innerHTML = '<tr><td colspan="3" class="loading-msg">🔍 자료를 검색하는 중...</td></tr>';
+        openModal(searchResultsModal);
+
+        // Fetch session for download permission check
+        const { data: { session } } = await supabase.auth.getSession();
+
+        const { data, error } = await supabase
+            .from('files')
+            .select('*')
+            .ilike('title', `%${term}%`)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            searchResultsContent.innerHTML = `<tr><td colspan="3" class="loading-msg" style="color:red;">오류 발생: ${error.message}</td></tr>`;
+            return;
         }
+
+        if (!data || data.length === 0) {
+            searchCount.textContent = `'${term}'에 대한 검색 결과가 없습니다.`;
+            searchResultsContent.innerHTML = '<tr><td colspan="3" class="loading-msg">검색 결과가 없습니다.</td></tr>';
+            return;
+        }
+
+        searchCount.textContent = `'${term}'에 대해 ${data.length}개의 자료를 찾았습니다.`;
+        searchResultsContent.innerHTML = '';
+        
+        data.forEach((file, i) => {
+            const ext = file.file_path.split('.').pop().toLowerCase();
+            const badgeClass = ext === 'pdf' ? 'badge-pdf' : ext === 'hwp' ? 'badge-hwp' : 'badge-docx';
+            const { data: urlData } = supabase.storage.from('documents').getPublicUrl(file.file_path);
+
+            let actionHtml = '';
+            if (session) {
+                actionHtml = `<a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a>`;
+            } else {
+                actionHtml = `<button class="lock-btn" onclick="alert('관리자 로그인이 필요한 서비스입니다.'); window.location.href='admin.html';">🔒 로그인 필요</button>`;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td class="title-cell"><span class="badge-type ${badgeClass}">${ext.toUpperCase()}</span>${file.title}</td>
+                <td>${actionHtml}</td>
+            `;
+            searchResultsContent.appendChild(tr);
+        });
     }
 
     if(searchBtn) {

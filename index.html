@@ -162,6 +162,31 @@
         </div>
     </div>
 
+    <!-- Search Results Modal -->
+    <div class="modal-overlay" id="searchResultsModal">
+        <div class="glass-modal modal-wide">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>자료 검색 결과</h2>
+                <p id="searchCount">자료실에서 검색된 내역입니다.</p>
+            </div>
+            <div class="search-results-container">
+                <table class="board-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">번호</th>
+                            <th width="60%">제목</th>
+                            <th width="30%">다운로드</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchResultsContent">
+                        <!-- Results will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script type="module" src="app.js"></script>
 </body>
