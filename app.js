@@ -114,17 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Facebook OAuth
-    const loginFacebook = document.getElementById('loginFacebook');
-    if(loginFacebook) {
-        loginFacebook.addEventListener('click', async () => {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'facebook',
-                options: { redirectTo: window.location.origin + '/dashboard.html' }
-            });
-            if(error) alert('페이스북 로그인 오류: ' + error.message);
-        });
-    }
 
     // Search Functionality
     const searchInput = document.getElementById('searchInput');
