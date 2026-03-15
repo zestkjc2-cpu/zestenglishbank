@@ -86,7 +86,7 @@
             <nav class="main-nav">
                 <ul class="nav-list">
                     <li><a href="board.html?category=Manual" class="nav-link outline-link">사용매뉴얼</a></li>
-                    <li><a href="trial.html" class="nav-link outline-link">자료실로 돌아가기</a></li>
+                    <li><a href="index.html" class="nav-link outline-link">돌아가기</a></li>
                 </ul>
             </nav>
         </div>
@@ -152,6 +152,45 @@
         </div>
     </section>
 
+    <!-- Modals (Hidden by default) -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content glass-modal">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>회원 로그인</h2>
+                <p>제스트 영어 문제은행에 오신 것을 환영합니다.</p>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <label>이메일</label>
+                    <input type="email" id="loginEmail" placeholder="email@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
+                <button type="submit" class="btn btn-gradient btn-full">로그인</button>
+                
+                <div class="social-login-divider">
+                    <span>또는</span>
+                </div>
+                <div class="social-login-actions">
+                    <button type="button" class="btn btn-social btn-zest" id="signupZest">
+                        제스트 회원가입하기
+                    </button>
+                    <button type="button" class="btn btn-social btn-google" id="loginGoogle">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="social-icon"> 구글로 로그인하기
+                    </button>
+                    <button type="button" class="btn btn-social btn-naver" id="loginNaver">
+                        <img src="https://www.naver.com/favicon.ico" alt="Naver" class="social-icon"> 네이버로 가입하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
 
@@ -177,11 +216,15 @@
             }
         });
 
-        // Check if admin is logged in
+        // Check if user is logged in
         const { data: { session } } = await supabase.auth.getSession();
+        const loginModal = document.getElementById('loginModal');
+
         if (session) {
             document.getElementById('adminBar').style.display = 'flex';
-            document.getElementById('adminBarEmail').textContent = '👤 관리자: ' + session.user.email;
+            document.getElementById('adminBarEmail').textContent = '👤 사용자: ' + session.user.email;
+            // Only show upload panel for specific admin email or just show it for now as per previous logic
+            // (Assuming any logged in user can currently see it or we keep it as is)
             document.getElementById('adminUploadPanel').style.display = 'block';
             document.getElementById('checkCol').style.display = 'table-cell';
             document.getElementById('deleteSelectedBtn').style.display = 'inline-block';
@@ -192,8 +235,7 @@
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await supabase.auth.signOut();
-            document.getElementById('adminBar').style.display = 'none';
-            document.getElementById('adminUploadPanel').style.display = 'none';
+            window.location.reload();
         });
 
         // File Upload
@@ -248,7 +290,6 @@
                     statusEl.className = 'status-msg err';
                     break;
                 }
-                
                 successCount++;
             }
 
@@ -297,7 +338,7 @@
                     actionHtml += ` <button class="delete-btn" onclick="window.deleteFile('${file.id}', '${file.file_path}')">삭제</button>`;
                     checkHtml = `<td><input type="checkbox" class="file-check" data-id="${file.id}" data-path="${file.file_path}"></td>`;
                 } else {
-                    actionHtml = `<button class="lock-btn" onclick="alert('관리자 로그인이 필요한 서비스입니다.'); window.location.href='admin.html';">🔒 로그인 후 다운로드</button>`;
+                    actionHtml = `<button class="lock-btn">🔒 로그인 후 다운로드</button>`;
                 }
 
                 tr.innerHTML = `
@@ -307,6 +348,15 @@
                     <td>${date}</td>
                     <td>${actionHtml}</td>
                 `;
+
+                // Add click listener to lock-btn to open modal
+                const lb = tr.querySelector('.lock-btn');
+                if (lb) {
+                    lb.onclick = () => {
+                        if (loginModal) loginModal.classList.add('active');
+                    };
+                }
+
                 tbody.appendChild(tr);
             });
         }

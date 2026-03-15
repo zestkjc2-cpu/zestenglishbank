@@ -62,6 +62,7 @@
             <nav class="main-nav">
                 <ul class="nav-list">
                     <li><a href="board.html?category=Manual" class="nav-link outline-link">사용매뉴얼</a></li>
+                    <li><a href="#" class="nav-link primary-btn" id="loginBtn">Login</a></li>
                     <li><a href="index.html" class="nav-link outline-link">돌아가기</a></li>
                 </ul>
             </nav>
@@ -87,31 +88,68 @@
         </div>
     </section>
 
+    <!-- Modals (Hidden by default) -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content glass-modal">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>회원 로그인</h2>
+                <p>제스트 영어 문제은행에 오신 것을 환영합니다.</p>
+            </div>
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <label>이메일</label>
+                    <input type="email" id="loginEmail" placeholder="email@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
+                <button type="submit" class="btn btn-gradient btn-full">로그인</button>
+                
+                <div class="social-login-divider">
+                    <span>또는</span>
+                </div>
+                <div class="social-login-actions">
+                    <button type="button" class="btn btn-social btn-zest" id="signupZest">
+                        제스트 회원가입하기
+                    </button>
+                    <button type="button" class="btn btn-social btn-google" id="loginGoogle">
+                        <img src="https://www.google.com/favicon.ico" alt="Google" class="social-icon"> 구글로 로그인하기
+                    </button>
+                    <button type="button" class="btn btn-social btn-naver" id="loginNaver">
+                        <img src="https://www.naver.com/favicon.ico" alt="Naver" class="social-icon"> 네이버로 가입하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await supabase.auth.getSession();
+            const loginModal = document.getElementById('loginModal');
             
             const trialBtns = document.querySelectorAll('.trial-page-btn');
             trialBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     if (!session) {
                         e.preventDefault();
-                        alert('로그인이 필요한 서비스입니다.');
-                        window.location.href = 'admin.html';
+                        if (loginModal) loginModal.classList.add('active');
                     }
                 });
             });
 
-            // Also check '사용매뉴얼' link in header
             const manualLink = document.querySelector('a[href*="category=Manual"]');
             if (manualLink) {
                 manualLink.addEventListener('click', (e) => {
                     if (!session) {
                         e.preventDefault();
-                        alert('로그인이 필요한 서비스입니다.');
-                        window.location.href = 'admin.html';
+                        if (loginModal) loginModal.classList.add('active');
                     }
                 });
             }
