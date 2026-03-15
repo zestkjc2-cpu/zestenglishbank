@@ -192,6 +192,54 @@ ul {
     background: none;
     border: none;
     cursor: pointer;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 101;
+}
+
+.mobile-menu-btn span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+    }
+    
+    .nav-list {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        max-width: 300px;
+        height: 100vh;
+        background: var(--surface);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        transition: right 0.3s ease;
+        z-index: 100;
+        padding: 2rem;
+    }
+    
+    .nav-list.active {
+        right: 0;
+    }
+    
+    .mobile-menu-btn.active span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .mobile-menu-btn.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .mobile-menu-btn.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
 }
 
 /* Glassmorphism Classes */
@@ -242,7 +290,7 @@ ul {
 }
 
 .hero-title {
-    font-size: 3rem;
+    font-size: 2.2rem;
     font-weight: 800;
     line-height: 1.2;
     margin-bottom: 24px;
@@ -250,6 +298,10 @@ ul {
 }
 
 @media (min-width: 768px) {
+    .hero-title { font-size: 3rem; }
+}
+
+@media (min-width: 1024px) {
     .hero-title { font-size: 4rem; }
 }
 
@@ -736,4 +788,76 @@ form .btn {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
     border-color: var(--primary);
+}
+
+/* Base Responsive Typography & Spacing */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 120px 0 60px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+    }
+
+    .notice-ticker-container {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 15px;
+    }
+
+    /* Modal Adjustments */
+    .glass-modal {
+        padding: 24px 20px;
+    }
+    
+    /* Board Table Adjustments */
+    .board-container {
+        padding: 15px;
+    }
+    
+    /* Wrap the table in a scrollable div dynamically or style it here */
+    .board-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .board-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Admin Upload adjustments */
+    .upload-row {
+        flex-direction: column;
+    }
+    
+    .upload-row input, .upload-row select, .upload-row button {
+        width: 100%;
+    }
+    
+    /* Features Section */
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    /* Trial Grid */
+    .trial-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .trial-btn {
+        padding: 16px;
+        font-size: 1rem;
+    }
 }
