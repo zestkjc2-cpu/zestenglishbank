@@ -317,7 +317,7 @@ ul {
 .hero-section::before {
     content: '';
     position: absolute;
-    right: -60px;
+    right: -175px;
     bottom: -40px;
     width: 520px;
     height: 680px;
@@ -325,7 +325,7 @@ ul {
     background-size: 130%;
     background-position: 30% 20%;
     border-radius: 20px;
-    opacity: 0.10;
+    opacity: 0.15;
     transform: rotate(6deg);
     z-index: 1;
     filter: grayscale(20%) blur(0.5px);
@@ -335,7 +335,7 @@ ul {
 .hero-section::after {
     content: '';
     position: absolute;
-    right: 260px;
+    right: 145px;
     top: 80px;
     width: 320px;
     height: 420px;
@@ -343,7 +343,7 @@ ul {
     background-size: 120%;
     background-position: 20% 30%;
     border-radius: 14px;
-    opacity: 0.065;
+    opacity: 0.10;
     transform: rotate(-3deg);
     z-index: 1;
     filter: grayscale(30%);
