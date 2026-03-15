@@ -79,15 +79,13 @@
             </div>
             
             <div class="hero-image-wrapper">
-                <div class="glass-card main-showcase search-box-container" style="padding: 60px 40px; border-radius: 16px; background: url('https://lh3.googleusercontent.com/pw/AP1GczOKmF0rZ9Z8Z3vK1x2J9C8L_W3lQ9l_m6L8xX0') center/cover no-repeat; text-align: center; box-shadow: var(--shadow-xl); position: relative; overflow: hidden;">
-                    <!-- Overlay to make text and search box readable against the image -->
-                    <div style="position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.4); z-index: 1;"></div>
+                <div class="glass-card main-showcase search-box-container" style="padding: 60px 40px; border-radius: 16px; background-color: #f1f5f9; text-align: center; box-shadow: var(--shadow-xl); position: relative; overflow: hidden;">
                     
                     <div style="position: relative; z-index: 2;">
-                        <h3 style="margin-bottom: 25px; font-size: 1.7rem; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">영어 자료 검색</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 450px; margin: 0 auto; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 12px; backdrop-filter: blur(10px);">
-                            <input type="text" id="searchInput" placeholder="검색어를 입력하세요..." class="image-search-input" style="flex: 1 1 200px; min-width: 0; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                            <button id="searchBtn" class="btn btn-gradient search-btn" style="flex: 0 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.2); white-space: nowrap;">검색</button>
+                        <h3 style="margin-bottom: 25px; font-size: 1.7rem; color: var(--text-main);">영어 자료 검색</h3>
+                        <div class="flex-container" style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 450px; margin: 0 auto; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                            <input type="text" id="searchInput" placeholder="검색어를 입력하세요..." class="image-search-input" style="flex: 1 1 200px; min-width: 0; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <button id="searchBtn" class="btn btn-gradient search-btn" style="flex: 0 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.15); white-space: nowrap;">검색</button>
                         </div>
                     </div>
                 </div>
