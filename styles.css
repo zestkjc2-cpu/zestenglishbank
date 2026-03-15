@@ -322,13 +322,13 @@ ul {
     width: 520px;
     height: 680px;
     background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
-    background-size: cover;
-    background-position: center top;
+    background-size: 130%;
+    background-position: 30% 20%;
     border-radius: 20px;
-    opacity: 0.08;
+    opacity: 0.10;
     transform: rotate(6deg);
     z-index: 1;
-    filter: grayscale(30%) blur(1px);
+    filter: grayscale(20%) blur(0.5px);
     pointer-events: none;
 }
 
@@ -340,13 +340,13 @@ ul {
     width: 320px;
     height: 420px;
     background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
-    background-size: cover;
-    background-position: center top;
+    background-size: 120%;
+    background-position: 20% 30%;
     border-radius: 14px;
-    opacity: 0.05;
+    opacity: 0.065;
     transform: rotate(-3deg);
     z-index: 1;
-    filter: grayscale(50%) blur(0.5px);
+    filter: grayscale(30%);
     pointer-events: none;
 }
 
