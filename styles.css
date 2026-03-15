@@ -405,6 +405,7 @@ ul {
     -webkit-text-fill-color: transparent;
     animation: silverShine 4s linear infinite;
     display: inline-block;
+    white-space: nowrap;
 }
 
 @keyframes silverShine {
@@ -421,6 +422,8 @@ ul {
     background: linear-gradient(to right, var(--primary-light), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .hero-subtitle {
