@@ -314,6 +314,42 @@ ul {
     align-items: center;
 }
 
+.hero-section::before {
+    content: '';
+    position: absolute;
+    right: -60px;
+    bottom: -40px;
+    width: 520px;
+    height: 680px;
+    background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
+    background-size: cover;
+    background-position: center top;
+    border-radius: 20px;
+    opacity: 0.08;
+    transform: rotate(6deg);
+    z-index: 1;
+    filter: grayscale(30%) blur(1px);
+    pointer-events: none;
+}
+
+.hero-section::after {
+    content: '';
+    position: absolute;
+    right: 260px;
+    top: 80px;
+    width: 320px;
+    height: 420px;
+    background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
+    background-size: cover;
+    background-position: center top;
+    border-radius: 14px;
+    opacity: 0.05;
+    transform: rotate(-3deg);
+    z-index: 1;
+    filter: grayscale(50%) blur(0.5px);
+    pointer-events: none;
+}
+
 .hero-container {
     display: grid;
     grid-template-columns: 1fr;
