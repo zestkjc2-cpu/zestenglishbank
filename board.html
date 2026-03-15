@@ -73,12 +73,7 @@
             </a>
             <nav class="main-nav">
                 <ul class="nav-list">
-                    <li class="dropdown">
-                        <a href="#" class="nav-link outline-link" style="display:flex; align-items:center; gap:4px;">사용매뉴얼 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" class="dropdown-link">게시판</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="board.html?category=Manual" class="nav-link outline-link">사용매뉴얼</a></li>
                     <li><a href="trial.html" class="nav-link outline-link">자료실로 돌아가기</a></li>
                 </ul>
             </nav>
@@ -103,6 +98,7 @@
                             <input type="text" id="fileTitle" placeholder="제목을 입력하세요" required>
                             <select id="fileCategory" required>
                                 <option value="">카테고리 선택</option>
+                                <option value="Manual">사용매뉴얼</option>
                                 <option value="Vocabulary">어휘자료</option>
                                 <option value="School">내신정복</option>
                                 <option value="Mistakes">최다오답15</option>
@@ -146,7 +142,7 @@
         import { supabase } from './supabaseClient.js';
 
         const categoryMap = {
-            'Vocabulary': '어휘자료', 'School': '내신정복', 'Mistakes': '최다오답15',
+            'Manual': '사용매뉴얼', 'Vocabulary': '어휘자료', 'School': '내신정복', 'Mistakes': '최다오답15',
             'Mock': '모의고사', 'Middle': '중등교과서', 'High': '고등교과서'
         };
 
