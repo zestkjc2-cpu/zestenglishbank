@@ -67,7 +67,7 @@ ul {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: none;
+    border: 1px solid transparent;
 }
 
 .btn-large {
@@ -838,11 +838,13 @@ form .btn {
         font-size: 0.85rem;
     }
 
-    /* Search Box Container on Mobile (4/5 width = 80%) */
+    /* Search Box Container on Mobile */
     .search-box-container {
-        width: 84%; /* Slight bump to width */
-        margin: 0 auto 0 -2%; /* Shift slightly left */
+        width: 92%; /* Increased width by ~0.8cm */
+        margin: 0 auto !important; /* Centered precisely */
         padding: 30px 15px !important;
+        background-color: rgba(241, 245, 249, 0.75) !important; /* Semi-transparent */
+        backdrop-filter: blur(10px);
     }
     
     .search-box-container h3 {
