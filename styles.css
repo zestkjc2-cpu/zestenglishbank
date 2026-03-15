@@ -317,36 +317,16 @@ ul {
 .hero-section::before {
     content: '';
     position: absolute;
-    right: -175px;
-    bottom: -40px;
-    width: 520px;
-    height: 680px;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
     background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
-    background-size: 130%;
-    background-position: 30% 20%;
-    border-radius: 20px;
-    opacity: 0.15;
-    transform: rotate(6deg);
+    background-size: cover;
+    background-position: center top;
+    opacity: 0.70;
     z-index: 1;
-    filter: grayscale(20%) blur(0.5px);
-    pointer-events: none;
-}
-
-.hero-section::after {
-    content: '';
-    position: absolute;
-    right: 145px;
-    top: 80px;
-    width: 320px;
-    height: 420px;
-    background-image: url('https://previews.123rf.com/images/lamaip/lamaip1701/lamaip170100048/69547241-english-exam-sheet.jpg');
-    background-size: 120%;
-    background-position: 20% 30%;
-    border-radius: 14px;
-    opacity: 0.10;
-    transform: rotate(-3deg);
-    z-index: 1;
-    filter: grayscale(30%);
+    filter: grayscale(15%);
     pointer-events: none;
 }
 
