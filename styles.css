@@ -1033,7 +1033,7 @@ form .btn {
     .hero-section::before {
         display: block;
         width: 100%;
-        opacity: 0.34;
+        opacity: 0.20;
         filter: grayscale(15%) blur(4px);
         -webkit-mask-image: none;
         mask-image: none;
