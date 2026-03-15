@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tickerList = document.getElementById('noticeTicker');
     if (tickerList) {
         const items = tickerList.querySelectorAll('li');
-        const itemHeight = 24;
+        const itemHeight = 36;
         let currentIndex = 0;
 
         if (items.length > 1) {

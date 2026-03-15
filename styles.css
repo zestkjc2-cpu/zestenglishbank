@@ -458,7 +458,7 @@ ul {
 }
 
 .ticker-viewport {
-    height: 24px;
+    height: 36px;
     overflow: hidden;
     flex-grow: 1;
     position: relative;
@@ -471,8 +471,8 @@ ul {
 }
 
 .ticker-list li {
-    height: 24px;
-    line-height: 24px;
+    height: 36px;
+    line-height: 36px;
     font-size: 0.9rem;
     color: var(--text-muted);
     white-space: nowrap;
