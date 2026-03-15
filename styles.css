@@ -174,6 +174,58 @@ ul {
     color: var(--white);
 }
 
+/* Dropdown Menu Styles */
+.dropdown {
+    position: relative;
+    padding: 10px 0; /* Creates an invisible bridge to hover the submenu */
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 140px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.dropdown:hover svg {
+    transform: rotate(180deg);
+}
+
+.dropdown a svg {
+    transition: transform 0.3s ease;
+}
+
+.dropdown-link {
+    display: block;
+    padding: 8px 20px;
+    color: var(--text-main);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.dropdown-link:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--primary);
+}
+
 .primary-btn {
     background: var(--primary);
     color: white;
@@ -311,7 +363,7 @@ ul {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: silverShine 3s linear infinite;
+    animation: silverShine 4s linear infinite;
     display: inline-block;
 }
 
