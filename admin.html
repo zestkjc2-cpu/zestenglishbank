@@ -84,7 +84,8 @@
                         <form class="upload-form" id="uploadForm">
                             <select id="fileCategory" required>
                                 <option value="">카테고리 선택</option>
-                                <option value="Vocabulary">어휘자료</option>
+                                <option value="Manual">사용매뉴얼</option>
+                                <option value="Vocabulary">어휘</option>
                                 <option value="School">내신정복</option>
                                 <option value="Mistakes">최다오답15</option>
                                 <option value="Mock">모의고사</option>
@@ -141,8 +142,8 @@
             if (error) {
                 adminError.textContent = '로그인 실패: ' + error.message;
             } else {
-                // Redirect to resource room (trial page) as admin
-                window.location.href = 'trial.html';
+                // Redirect to resource board as admin
+                window.location.href = 'board.html';
             }
         });
 
