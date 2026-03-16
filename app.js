@@ -77,10 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // All buttons that should toggle Orange -> Indigo
+        // All elements that should toggle Orange -> Indigo
         const dynamicBtns = [
             loginBtn, 
             entryLoginBtn, 
+            document.querySelector('.zest-brand'),
+            document.getElementById('searchBtn'),
             document.getElementById('modalSubmitBtn'), 
             document.getElementById('signupZest')
         ];

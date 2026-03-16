@@ -186,8 +186,20 @@ ul {
     font-weight: 900;
     background: linear-gradient(to right, var(--secondary), var(--secondary-light));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
+    transition: all 0.3s ease;
+}
+
+.zest-brand.logged-in {
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.auth-dynamic-btn {
+    color: white !important; /* Force Login text to be white */
 }
 
 .brand-text {
