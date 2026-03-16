@@ -125,6 +125,31 @@ ul {
     border-color: var(--primary-light);
 }
 
+/* Dynamic Hero Login Button */
+.btn-login-dynamic {
+    background: linear-gradient(135deg, var(--secondary), #ea580c);
+    color: var(--white);
+    box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.39);
+    border: 1px solid var(--secondary);
+}
+
+.btn-login-dynamic:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+    border-color: var(--secondary-light);
+}
+
+.btn-login-dynamic.logged-in {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+    border: 1px solid var(--primary);
+}
+
+.btn-login-dynamic.logged-in:hover {
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+    border-color: var(--primary-light);
+}
+
 /* Header */
 .header {
     position: fixed;
