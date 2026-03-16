@@ -29,6 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Intercept Gated Buttons on Home Page
+    const entryFreeBtn = document.getElementById('entryFreeBtn');
+    const converterBtn = document.getElementById('converterBtn');
+    const questionGenBtn = document.getElementById('questionGenBtn');
+
+    async function handleGatedLink(e, url) {
+        e.preventDefault();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            window.location.href = url;
+        } else {
+            alert('로그인이 필요한 서비스입니다.');
+            openModal(loginModal);
+        }
+    }
+
+    if(entryFreeBtn) entryFreeBtn.addEventListener('click', (e) => handleGatedLink(e, 'trial.html'));
+    if(converterBtn) converterBtn.addEventListener('click', (e) => handleGatedLink(e, 'converter.html'));
+    if(questionGenBtn) questionGenBtn.addEventListener('click', (e) => handleGatedLink(e, 'question_gen.html'));
+
     closeModals.forEach(btn => {
         btn.addEventListener('click', () => {
              const modal = btn.closest('.modal-overlay');
@@ -46,9 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = text;
                 btn.onclick = async (e) => {
                     e.preventDefault();
-                    const { error } = await supabase.auth.signOut();
-                    if (error) alert('로그아웃 오류: ' + error.message);
-                    else window.location.reload();
+                    if (confirm('로그아웃 하시겠습니까?')) {
+                        const { error } = await supabase.auth.signOut();
+                        if (error) alert('로그아웃 오류: ' + error.message);
+                        else window.location.href = 'index.html';
+                    }
                 };
             } else {
                 btn.innerHTML = text;
@@ -60,6 +82,15 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBtn(loginBtn, 'Logout', true);
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
+        } else {
+            // Auto open login modal if requested via URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('login') === 'true') {
+                setTimeout(() => {
+                    alert('로그인이 필요한 서비스입니다.');
+                    openModal(loginModal);
+                }, 500);
+            }
         }
     }
 

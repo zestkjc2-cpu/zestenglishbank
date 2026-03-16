@@ -67,32 +67,35 @@
                 <div id="setupGuide" class="setup-guide" style="display:none;">
                     <h3>⚠️ [안내] 회원 관리 기능을 위해 데이터베이스 설정이 필요합니다.</h3>
                     <p>현재 데이터베이스에 <strong><code>profiles</code></strong>(또는 유사한) 테이블이 없어 회원 목록을 불러올 수 없습니다. Supabase SQL Editor에서 아래 쿼리를 실행해 주시면 정상 작동합니다.</p>
-<pre><code>-- 1. profiles 테이블 생성
-create table public.profiles (
+<pre><code>-- 1. profiles 테이블 생성 (이미 있으면 건너뜀)
+create table if not exists public.profiles (
   id uuid references auth.users not null primary key,
   email text,
   full_name text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 2. 새 회원가입 시 profiles 테이블에도 자동으로 레코드를 추가하는 트리거 생성
-create function public.handle_new_user()
+-- 2. 새 회원가입 시 profiles 테이블에도 자동으로 레코드를 추가하는 함수 생성
+create or replace function public.handle_new_user()
 returns trigger as $$
 begin
   insert into public.profiles (id, email)
-  values (new.id, new.email);
+  values (new.id, new.email)
+  on conflict (id) do nothing;
   return new;
 end;
 $$ language plpgsql security definer;
 
--- 3. 트리거 연결
+-- 3. 트리거 연결 (기존 트리거 삭제 후 재생성)
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- (선택) 4. 기존 auth.users 데이터를 profiles로 한번에 복사 (처음 1회만 실행)
+-- (선택) 4. 기존 auth.users 데이터를 profiles로 복사 (충돌 시 건너뜀)
 insert into public.profiles (id, email, created_at)
-select id, email, created_at from auth.users;
+select id, email, created_at from auth.users
+on conflict (id) do nothing;
 </code></pre>
                 </div>
 
