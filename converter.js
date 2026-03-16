@@ -1,0 +1,124 @@
+// converter.js using pdf.js and docx.js
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const defaultContent = document.querySelector('.default-content');
+const selectedFileName = document.getElementById('selectedFileName');
+const changeFileBtn = document.getElementById('changeFileBtn');
+const convertBtn = document.getElementById('convertBtn');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const statusText = document.getElementById('statusText');
+
+let currentFile = null;
+
+// Event Listeners for Drop Zone
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('active');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('active');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('active');
+    if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+    }
+});
+
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+    }
+});
+
+changeFileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fileInput.click();
+});
+
+function handleFile(file) {
+    if (file.type !== 'application/pdf') {
+        alert('PDF 파일만 선택 가능합니다.');
+        return;
+    }
+    currentFile = file;
+    selectedFileName.textContent = file.name;
+    defaultContent.style.display = 'none';
+    fileInfo.style.display = 'flex';
+    convertBtn.style.display = 'block';
+    resetProgress();
+}
+
+function resetProgress() {
+    progressContainer.style.display = 'none';
+    progressBar.style.width = '0%';
+    statusText.textContent = '';
+}
+
+convertBtn.addEventListener('click', async () => {
+    if (!currentFile) return;
+
+    convertBtn.disabled = true;
+    convertBtn.textContent = '변환 중...';
+    progressContainer.style.display = 'block';
+    statusText.textContent = 'PDF 데이터를 불러오는 중...';
+
+    try {
+        const arrayBuffer = await currentFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const totalPages = pdf.numPages;
+        let fullText = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+            statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
+            const percent = (i / totalPages) * 50; // First 50% for parsing
+            progressBar.style.width = `${percent}%`;
+
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            
+            // Extract text items and join them with spaces
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            fullText += pageText + "\n\n";
+        }
+
+        statusText.textContent = '워드 파일 생성 중...';
+        progressBar.style.width = `80%`;
+
+        // Create DOCX structure using docx library
+        const { Document, Packer, Paragraph, TextRun } = docx;
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: fullText.split('\n').map(line => {
+                    return new Paragraph({
+                        children: [new TextRun(line)],
+                    });
+                }),
+            }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, currentFile.name.replace('.pdf', '') + "_converted.docx");
+
+        progressBar.style.width = `100%`;
+        statusText.textContent = '변환 완료!';
+        convertBtn.textContent = '변환 완료! (다시 하려면 클릭)';
+        convertBtn.disabled = false;
+
+    } catch (error) {
+        console.error(error);
+        statusText.textContent = '변환 중 오류가 발생했습니다.';
+        convertBtn.disabled = false;
+        convertBtn.textContent = '워드 파일로 변환하기 🚀';
+    }
+});
