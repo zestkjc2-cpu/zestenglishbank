@@ -82,8 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBtn(loginBtn, 'Logout', true);
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
+            if (loginBtn) loginBtn.classList.add('logged-in');
             if (entryLoginBtn) entryLoginBtn.classList.add('logged-in');
         } else {
+            if (loginBtn) loginBtn.classList.remove('logged-in');
             if (entryLoginBtn) entryLoginBtn.classList.remove('logged-in');
             // Auto open login modal if requested via URL
             const urlParams = new URLSearchParams(window.location.search);
