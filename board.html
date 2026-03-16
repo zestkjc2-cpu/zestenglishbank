@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="styles.css">
     <script type="module">
         import { supabase } from './supabaseClient.js';
-        const urlParams = new URLSearchParams(window.location.search);
-        const isManual = urlParams.get('category') === 'Manual';
+        const headParams = new URLSearchParams(window.location.search);
+        const isManualPage = headParams.get('category') === 'Manual';
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        if (!initialSession && !isManual) window.location.href = 'index.html?login=true';
+        if (!initialSession && !isManualPage) window.location.href = 'index.html?login=true';
     </script>
     <style>
         .board-container {
