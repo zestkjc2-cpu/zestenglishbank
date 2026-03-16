@@ -1080,9 +1080,9 @@ form .btn {
     }
 
     .hero-actions .btn {
-        width: 66%;
+        width: 90%;
         padding: 12px 16px;
-        font-size: 0.95rem;
+        font-size: 1rem;
     }
 
     .notice-ticker-container {
