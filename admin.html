@@ -75,28 +75,19 @@
                     </form>
                 </div>
 
-                <!-- Upload Section (shown after login) -->
-                <div id="uploadSection" style="display:none;">
-                    <p class="status-msg ok" id="welcomeMsg"></p>
+                <!-- Dashboard Section (shown after login) -->
+                <div id="dashboardSection" style="display:none; text-align: center;">
+                    <p class="status-msg ok" id="welcomeMsg" style="margin-bottom: 24px;"></p>
 
-                    <div class="admin-section">
-                        <h3>📂 자료 파일 업로드</h3>
-                        <form class="upload-form" id="uploadForm">
-                            <select id="fileCategory" required>
-                                <option value="">카테고리 선택</option>
-                                <option value="Manual">사용매뉴얼</option>
-                                <option value="Vocabulary">어휘</option>
-                                <option value="School">내신정복</option>
-                                <option value="Mistakes">최다오답15</option>
-                                <option value="Mock">모의고사</option>
-                                <option value="Middle">중등교과서</option>
-                                <option value="High">고등교과서</option>
-                            </select>
-                            <input type="text" id="fileTitle" placeholder="문서 제목 입력" required>
-                            <input type="file" id="fileInput" accept=".pdf,.hwp,.docx" required>
-                            <button type="submit" class="btn btn-gradient">업로드</button>
-                            <p id="uploadStatus" class="status-msg"></p>
-                        </form>
+                    <div class="admin-section" style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
+                        <button onclick="location.href='admin_members.html'" class="btn btn-gradient" style="flex: 1; padding: 24px 16px; font-size: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 12px; background: linear-gradient(135deg, #10b981, #059669);">
+                            <span style="font-size: 2rem;">👥</span>
+                            회원관리
+                        </button>
+                        <button onclick="location.href='board.html'" class="btn btn-gradient" style="flex: 1; padding: 24px 16px; font-size: 1.2rem; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">📂</span>
+                            자료실
+                        </button>
                     </div>
 
                     <div class="admin-section">
@@ -111,24 +102,22 @@
         import { supabase } from './supabaseClient.js';
 
         const loginSection = document.getElementById('loginSection');
-        const uploadSection = document.getElementById('uploadSection');
+        const dashboardSection = document.getElementById('dashboardSection');
         const adminLoginForm = document.getElementById('adminLoginForm');
         const adminError = document.getElementById('adminError');
         const welcomeMsg = document.getElementById('welcomeMsg');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadStatus = document.getElementById('uploadStatus');
         const logoutBtn = document.getElementById('logoutBtn');
 
         // Check if already logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            showUploadPanel(session.user.email);
+            showDashboardPanel(session.user.email);
         }
 
-        function showUploadPanel(email) {
+        function showDashboardPanel(email) {
             loginSection.style.display = 'none';
-            uploadSection.style.display = 'block';
-            welcomeMsg.textContent = '✅ 로그인됨: ' + email;
+            dashboardSection.style.display = 'block';
+            welcomeMsg.textContent = '✅ 환영합니다, 관리자님! (' + email + ')';
         }
 
         // Admin Login
@@ -142,77 +131,14 @@
             if (error) {
                 adminError.textContent = '로그인 실패: ' + error.message;
             } else {
-                // Redirect to resource board as admin
-                window.location.href = 'board.html';
-            }
-        });
-
-        // Auto-fill title from filename
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const titleEl = document.getElementById('fileTitle');
-            if (e.target.files[0] && !titleEl.value.trim()) {
-                titleEl.value = e.target.files[0].name.replace(/\.[^.]+$/, '');
-            }
-        });
-
-        // File Upload to Supabase Storage
-        function sanitizeFileName(name) {
-            return name
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-zA-Z0-9._\-]/g, '_')
-                .replace(/_+/g, '_')
-                .replace(/^_|_$/g, '');
-        }
-
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            uploadStatus.textContent = '업로드 중...';
-            uploadStatus.className = 'status-msg';
-
-            const category = document.getElementById('fileCategory').value;
-            const title = document.getElementById('fileTitle').value.trim();
-            const file = document.getElementById('fileInput').files[0];
-
-            if (!category || !title || !file) {
-                uploadStatus.textContent = '모든 항목을 입력해 주세요.';
-                uploadStatus.className = 'status-msg err';
-                return;
-            }
-
-            const safeName = sanitizeFileName(file.name);
-            const filePath = `${category}/${Date.now()}_${safeName}`;
-
-            // Upload to Storage
-            const { error: storageError } = await supabase.storage
-                .from('documents')
-                .upload(filePath, file);
-
-            if (storageError) {
-                uploadStatus.textContent = '업로드 오류: ' + storageError.message;
-                uploadStatus.className = 'status-msg err';
-                return;
-            }
-
-            // Insert record into 'files' DB table
-            const { error: dbError } = await supabase
-                .from('files')
-                .insert({ title, category, file_path: filePath });
-
-            if (dbError) {
-                uploadStatus.textContent = 'DB 저장 오류: ' + dbError.message;
-                uploadStatus.className = 'status-msg err';
-            } else {
-                uploadStatus.textContent = '✅ 업로드 완료!';
-                uploadStatus.className = 'status-msg ok';
-                uploadForm.reset();
+                showDashboardPanel(data.session.user.email);
             }
         });
 
         // Logout
         logoutBtn.addEventListener('click', async () => {
             await supabase.auth.signOut();
-            uploadSection.style.display = 'none';
+            dashboardSection.style.display = 'none';
             loginSection.style.display = 'block';
             welcomeMsg.textContent = '';
         });

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제스트 - 회원관리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .board-container {
+            max-width: 1000px; background: var(--surface);
+            border-radius: 16px; padding: 30px; box-shadow: var(--shadow-lg);
+            margin: 0 auto;
+        }
+        .board-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border);
+            flex-wrap: wrap; gap: 10px;
+        }
+        .board-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .board-table { width: 100%; border-collapse: collapse; text-align: center; }
+        .board-table th, .board-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); }
+        .board-table th { background: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; }
+        .board-table td.title-cell { text-align: left; font-weight: 500; color: var(--text-main); }
+        .board-table tr:hover { background: #f1f5f9; }
+        
+        .loading-msg { text-align: center; padding: 40px; color: var(--text-muted); }
+        .status-msg { margin-top: 10px; font-size: 0.9rem; font-weight: 600; text-align: center; }
+        .status-msg.err { color: #dc2626; }
+        
+        .setup-guide {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .setup-guide h3 { color: #b45309; margin-bottom: 12px; margin-top: 0; font-size: 1.1rem; }
+        .setup-guide pre { background: #fef3c7; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; border: 1px solid #fcd34d; }
+    </style>
+</head>
+<body style="background: var(--bg-color);">
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
+                <span class="zest-brand">ZEST ENGLISH BANK</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="home-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </a>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li><a href="admin.html" class="nav-link outline-link">← 관리자 메인</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section style="padding-top: 150px; min-height: 100vh;">
+        <div class="container">
+            <div class="board-container">
+                <div class="board-header">
+                    <div class="board-title">회원 명단 (Member List)</div>
+                </div>
+
+                <div id="setupGuide" class="setup-guide" style="display:none;">
+                    <h3>⚠️ [안내] 회원 관리 기능을 위해 데이터베이스 설정이 필요합니다.</h3>
+                    <p>현재 데이터베이스에 <strong><code>profiles</code></strong>(또는 유사한) 테이블이 없어 회원 목록을 불러올 수 없습니다. Supabase SQL Editor에서 아래 쿼리를 실행해 주시면 정상 작동합니다.</p>
+<pre><code>-- 1. profiles 테이블 생성
+create table public.profiles (
+  id uuid references auth.users not null primary key,
+  email text,
+  full_name text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 2. 새 회원가입 시 profiles 테이블에도 자동으로 레코드를 추가하는 트리거 생성
+create function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email)
+  values (new.id, new.email);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+-- 3. 트리거 연결
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- (선택) 4. 기존 auth.users 데이터를 profiles로 한번에 복사 (처음 1회만 실행)
+insert into public.profiles (id, email, created_at)
+select id, email, created_at from auth.users;
+</code></pre>
+                </div>
+
+                <table class="board-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">번호</th>
+                            <th width="40%">이메일 (ID)</th>
+                            <th width="30%">이름/학원명</th>
+                            <th width="20%">가입일자</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberList">
+                        <tr><td colspan="4" class="loading-msg">👤 회원 명단을 불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="app.js"></script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // Check if admin is logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            alert('관리자 로그인이 필요합니다.');
+            window.location.href = 'admin.html';
+        } else {
+            loadMembers();
+        }
+
+        async function loadMembers() {
+            const tbody = document.getElementById('memberList');
+            const setupGuide = document.getElementById('setupGuide');
+            
+            // Try formatting profiles table first
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                // If profiles table doesn't exist, Supabase will return code 42P01
+                if (error.code === 'PGRST204' || error.message.includes('relation "public.profiles" does not exist')) {
+                    setupGuide.style.display = 'block';
+                    tbody.innerHTML = `<tr><td colspan="4" class="status-msg err">데이터베이스 설정이 필요합니다. 상단의 안내를 참고해주세요.</td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="status-msg err">명단 불러오기 류: ${error.message}</td></tr>`;
+                }
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="loading-msg">가입된 회원이 없습니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach((member, i) => {
+                const date = new Date(member.created_at).toLocaleDateString('ko-KR');
+                const nameStr = member.full_name || '-';
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${data.length - i}</td>
+                    <td class="title-cell">${member.email}</td>
+                    <td>${nameStr}</td>
+                    <td>${date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

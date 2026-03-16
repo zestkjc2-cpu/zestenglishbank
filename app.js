@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 if(loginError) loginError.textContent = '로그인 실패: ' + error.message;
             } else {
-                window.location.reload();
+                window.location.href = 'trial.html';
             }
         });
     }
@@ -137,9 +137,21 @@ document.addEventListener('DOMContentLoaded', () => {
         loginGoogle.addEventListener('click', async () => {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
-                options: { redirectTo: window.location.origin + '/index.html' }
+                options: { redirectTo: window.location.origin + '/trial.html' }
             });
             if(error) alert('구글 로그인 오류: ' + error.message);
+        });
+    }
+
+    // Naver OAuth
+    const loginNaver = document.getElementById('loginNaver');
+    if(loginNaver) {
+        loginNaver.addEventListener('click', async () => {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'naver',
+                options: { redirectTo: window.location.origin + '/trial.html' }
+            });
+            if(error) alert('네이버 로그인 오류: ' + error.message);
         });
     }
 
@@ -191,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (session) {
                 actionHtml = `<a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a>`;
             } else {
-                actionHtml = `<button class="lock-btn" onclick="alert('관리자 로그인이 필요한 서비스입니다.'); window.location.href='admin.html';">🔒 로그인 필요</button>`;
+                actionHtml = `<button class="lock-btn" onclick="document.getElementById('loginModal').classList.add('active')">🔒 로그인 필요</button>`;
             }
 
             const tr = document.createElement('tr');
