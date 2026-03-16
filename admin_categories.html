@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제스트 - 관리자 자료 선택</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .category-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .category-btn:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--white);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+    </style>
+</head>
+<body style="background: var(--bg-color);">
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
+                <span class="zest-brand">ZEST ENGLISH BANK</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="home-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </a>
+            <nav class="main-nav">
+                <div class="header-actions">
+                    <a href="admin.html" class="nav-link outline-link">← 관리자 메인</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section class="features-section" style="padding-top: 150px; min-height: 100vh;">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="badge">관리자 전용</div>
+                <h2 class="section-title" style="margin-top:10px;">관리용 자료 카테고리 선택</h2>
+                <p class="section-desc">업로드 및 관리할 카테고리를 선택하세요.</p>
+            </div>
+            
+            <div class="category-grid">
+                <a href="board.html?category=Vocabulary" class="category-btn">어휘</a>
+                <a href="board.html?category=School" class="category-btn">내신정복</a>
+                <a href="board.html?category=Mistakes" class="category-btn">최다오답15</a>
+                <a href="board.html?category=Mock" class="category-btn">모의고사</a>
+                <a href="board.html?category=Middle" class="category-btn">중등교과서</a>
+                <a href="board.html?category=High" class="category-btn">고등교과서</a>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        
+        // Admin session check
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            alert('관리자 로그인이 필요합니다.');
+            window.location.href = 'admin.html';
+        }
+    </script>
+</body>
+</html>
