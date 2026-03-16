@@ -199,7 +199,11 @@ ul {
 }
 
 .auth-dynamic-btn {
-    color: white !important; /* Force Login text to be white */
+    color: white; 
+}
+
+#signupZest {
+    color: var(--text-main) !important;
 }
 
 .brand-text {
