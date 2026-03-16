@@ -275,6 +275,21 @@ ul {
     color: white;
 }
 
+.gray-btn {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.gray-btn:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
 .mobile-menu-btn {
     display: none !important;
 }

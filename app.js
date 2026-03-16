@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!category) return;
 
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
+            if (session || category === 'Manual') {
                 window.location.href = `board.html?category=${category}`;
             } else {
                 const loginModal = document.getElementById('loginModal');
