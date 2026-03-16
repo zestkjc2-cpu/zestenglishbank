@@ -127,26 +127,26 @@ ul {
 
 /* Dynamic Auth Button Utility (Orange -> Indigo) */
 .auth-dynamic-btn {
-    background: linear-gradient(135deg, var(--secondary), #ea580c);
+    background: linear-gradient(135deg, var(--secondary), #ea580c) !important;
     color: var(--white) !important;
-    border: 1px solid var(--secondary);
+    border: 1px solid var(--secondary) !important;
     transition: all 0.3s ease;
 }
 
 .auth-dynamic-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
-    border-color: var(--secondary-light);
+    border-color: var(--secondary-light) !important;
 }
 
 .auth-dynamic-btn.logged-in {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    border: 1px solid var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
+    border: 1px solid var(--primary) !important;
 }
 
 .auth-dynamic-btn.logged-in:hover {
     box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-    border-color: var(--primary-light);
+    border-color: var(--primary-light) !important;
 }
 
 /* Modal specific tweaks */
