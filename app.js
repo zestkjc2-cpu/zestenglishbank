@@ -78,13 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // All elements that should toggle Orange -> Indigo
-        const dynamicBtns = [
+        const dynamicElements = [
             loginBtn, 
             entryLoginBtn, 
-            document.querySelector('.zest-brand'),
-            document.getElementById('searchBtn'),
             document.getElementById('modalSubmitBtn'), 
-            document.getElementById('signupZest')
+            document.getElementById('signupZest'),
+            document.getElementById('searchBtn'),
+            document.querySelector('.zest-brand'),
+            document.querySelector('.highlight')
         ];
 
         if (session) {
@@ -92,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBtn(loginBtn, 'Logout', true);
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
-            dynamicBtns.forEach(btn => btn && btn.classList.add('logged-in'));
+            dynamicElements.forEach(el => el && el.classList.add('logged-in'));
         } else {
-            dynamicBtns.forEach(btn => btn && btn.classList.remove('logged-in'));
+            dynamicElements.forEach(el => el && el.classList.remove('logged-in'));
             // Auto open login modal if requested via URL
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('login') === 'true') {

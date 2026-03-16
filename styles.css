@@ -181,29 +181,34 @@ ul {
     gap: 12px;
 }
 
+/* Main Title Dynamic Gradient */
+.highlight {
+    background: linear-gradient(to right, var(--secondary), #f97316);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    white-space: nowrap;
+    transition: all 0.5s ease;
+}
+
+.highlight.logged-in {
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+}
+
 .zest-brand {
     font-size: 1.5rem;
     font-weight: 900;
-    background: linear-gradient(to right, var(--secondary), var(--secondary-light));
+    background: linear-gradient(to right, var(--secondary), #ea580c);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
 }
 
 .zest-brand.logged-in {
     background: linear-gradient(to right, var(--primary), var(--primary-light));
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
-.auth-dynamic-btn {
-    color: white; 
-}
-
-#signupZest {
-    color: var(--text-main) !important;
 }
 
 .brand-text {
@@ -503,14 +508,7 @@ ul {
     }
 }
 
-.highlight {
-    background: linear-gradient(to right, var(--secondary), var(--primary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    white-space: nowrap;
-}
+
 
 .hero-subtitle {
     font-size: 1.25rem;
