@@ -1,4 +1,5 @@
 // question_gen.js - English Exam Question Generator Engine
+import { supabase } from './supabaseClient.js';
 
 const generateBtn = document.getElementById('generateBtn');
 const passageInput = document.getElementById('passageInput');
@@ -9,6 +10,19 @@ const optionCards = document.querySelectorAll('.option-card');
 
 let selectedTypes = ['blank']; // Default
 let generatedData = [];
+
+// UI Sync with Auth State
+async function syncUI() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const dynamicElements = [
+        document.querySelector('.zest-brand'),
+        document.querySelector('.text-orange')
+    ];
+    if (session) {
+        dynamicElements.forEach(el => el && el.classList.add('logged-in'));
+    }
+}
+syncUI();
 
 // Handle Option Card Selection
 optionCards.forEach(card => {
@@ -161,7 +175,7 @@ function renderQuestion(q, title) {
 
 // Export to DOCX
 exportBtn.addEventListener('click', async () => {
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = window.docx || docx;
 
     const sections = generatedData.map(q => {
         const children = [

@@ -1,4 +1,5 @@
 // converter.js using pdf.js and docx.js
+import { supabase } from './supabaseClient.js';
 
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
@@ -12,6 +13,19 @@ const progressBar = document.getElementById('progressBar');
 const statusText = document.getElementById('statusText');
 
 let currentFile = null;
+
+// UI Sync with Auth State
+async function syncUI() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const dynamicElements = [
+        document.querySelector('.zest-brand'),
+        document.querySelector('.text-orange')
+    ];
+    if (session) {
+        dynamicElements.forEach(el => el && el.classList.add('logged-in'));
+    }
+}
+syncUI();
 
 // Event Listeners for Drop Zone
 dropZone.addEventListener('click', () => fileInput.click());
@@ -73,35 +87,46 @@ convertBtn.addEventListener('click', async () => {
 
     try {
         const arrayBuffer = await currentFile.arrayBuffer();
+        
+        // Ensure pdfjsLib is available
+        if (typeof pdfjsLib === 'undefined') {
+            throw new Error('PDF 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+        }
+
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const totalPages = pdf.numPages;
         let fullText = "";
 
         for (let i = 1; i <= totalPages; i++) {
             statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
-            const percent = (i / totalPages) * 50; // First 50% for parsing
+            const percent = (i / totalPages) * 50; 
             progressBar.style.width = `${percent}%`;
 
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
             
-            // Extract text items and join them with spaces
+            // Collect text items
             const pageText = textContent.items.map(item => item.str).join(' ');
-            fullText += pageText + "\n\n";
+            if (pageText.trim()) {
+                fullText += pageText + "\n\n";
+            }
+        }
+
+        if (!fullText.trim()) {
+            throw new Error('PDF에서 텍스트를 추출할 수 없습니다. 스캔된 이미지가 아닌 텍스트 기반 PDF를 사용해주세요.');
         }
 
         statusText.textContent = '워드 파일 생성 중...';
         progressBar.style.width = `80%`;
 
-        // Create DOCX structure using docx library
-        const { Document, Packer, Paragraph, TextRun } = docx;
+        // Create DOCX structure
+        const { Document, Packer, Paragraph, TextRun } = window.docx || docx;
 
         const doc = new Document({
             sections: [{
-                properties: {},
-                children: fullText.split('\n').map(line => {
+                children: fullText.split('\n').filter(line => line.trim()).map(line => {
                     return new Paragraph({
-                        children: [new TextRun(line)],
+                        children: [new TextRun({ text: line, font: "Pretendard" })],
                     });
                 }),
             }],
@@ -116,8 +141,8 @@ convertBtn.addEventListener('click', async () => {
         convertBtn.disabled = false;
 
     } catch (error) {
-        console.error(error);
-        statusText.textContent = '변환 중 오류가 발생했습니다.';
+        console.error("Conversion Detail Error:", error);
+        statusText.textContent = `변환 중 오류: ${error.message || '알 수 없는 오류'}`;
         convertBtn.disabled = false;
         convertBtn.textContent = '워드 파일로 변환하기 🚀';
     }
