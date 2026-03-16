@@ -125,29 +125,33 @@ ul {
     border-color: var(--primary-light);
 }
 
-/* Dynamic Hero Login Button */
-.btn-login-dynamic {
+/* Dynamic Auth Button Utility (Orange -> Indigo) */
+.auth-dynamic-btn {
     background: linear-gradient(135deg, var(--secondary), #ea580c);
     color: var(--white);
-    box-shadow: 0 4px 14px 0 rgba(249, 115, 22, 0.39);
     border: 1px solid var(--secondary);
+    transition: all 0.3s ease;
 }
 
-.btn-login-dynamic:hover {
+.auth-dynamic-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
     border-color: var(--secondary-light);
 }
 
-.btn-login-dynamic.logged-in {
+.auth-dynamic-btn.logged-in {
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
     border: 1px solid var(--primary);
 }
 
-.btn-login-dynamic.logged-in:hover {
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+.auth-dynamic-btn.logged-in:hover {
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
     border-color: var(--primary-light);
+}
+
+/* Modal specific tweaks */
+.btn-full.auth-dynamic-btn {
+    width: 100%;
 }
 
 /* Header */
@@ -484,8 +488,9 @@ ul {
 }
 
 .highlight {
-    background: linear-gradient(to right, var(--primary-light), var(--secondary));
+    background: linear-gradient(to right, var(--secondary), var(--primary));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
     white-space: nowrap;

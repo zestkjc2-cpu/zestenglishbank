@@ -37,7 +37,7 @@
             <nav class="main-nav">
                 <div class="header-actions">
                     <a href="board.html?category=Manual" class="nav-link gray-btn">사용안내</a>
-                    <a href="#" class="nav-link primary-btn" id="loginBtn">Login</a>
+                    <a href="#" class="nav-link auth-dynamic-btn" id="loginBtn">Login</a>
                 </div>
                 <!-- Nav list can remain empty or contain other links if needed later, but we hide it for now -->
                 <ul class="nav-list" style="display:none;">
@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="hero-actions">
-                     <button class="btn btn-large btn-login-dynamic" id="entryLoginBtn">로그인 <span>👤</span></button>
+                     <button class="btn btn-large auth-dynamic-btn" id="entryLoginBtn">로그인 <span>👤</span></button>
                      <a href="trial.html" class="btn btn-large gray-btn" id="entryFreeBtn">자료실 입장하기 <span>📁</span></a>
                      <a href="converter.html" class="btn btn-large gray-btn" id="converterBtn">PDF 파일 변환하기 <span>🔄</span></a>
                      <a href="question_gen.html" class="btn btn-large gray-btn" id="questionGenBtn">내신 변형문제 만들기 <span>✍️</span></a>
@@ -144,13 +144,13 @@
                     <input type="password" id="loginPassword" placeholder="Password" required>
                 </div>
                 <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
-                <button type="submit" class="btn btn-gradient btn-full">로그인</button>
+                <button type="submit" class="btn btn-full auth-dynamic-btn" id="modalSubmitBtn">로그인</button>
                 
                 <div class="social-login-divider">
                     <span>또는</span>
                 </div>
                 <div class="social-login-actions">
-                    <button type="button" class="btn btn-social btn-zest" id="signupZest">
+                    <button type="button" class="btn btn-social auth-dynamic-btn" id="signupZest">
                         제스트 회원가입하기
                     </button>
                     <button type="button" class="btn btn-social btn-google" id="loginGoogle">
