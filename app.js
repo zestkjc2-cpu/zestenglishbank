@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 if(loginError) loginError.textContent = '로그인 실패: ' + error.message;
             } else {
-                window.location.href = 'trial.html';
+                window.location.reload();
             }
         });
     }
