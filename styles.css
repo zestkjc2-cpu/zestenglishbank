@@ -186,7 +186,27 @@ ul {
 }
 
 .nav-link:hover {
-    color: var(--white);
+    color: var(--primary);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .header-actions {
+        gap: 8px;
+    }
+    .header-actions .nav-link {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    .brand-logo svg {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 /* Dropdown Menu Styles */
@@ -256,13 +276,7 @@ ul {
 }
 
 .mobile-menu-btn {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    flex-direction: column;
-    gap: 5px;
-    z-index: 101;
+    display: none !important;
 }
 
 .mobile-menu-btn span {
