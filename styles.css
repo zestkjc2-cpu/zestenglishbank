@@ -289,6 +289,25 @@ ul {
     color: var(--primary);
 }
 
+.primary-btn {
+    background: var(--secondary);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    border: 1px solid var(--secondary);
+}
+
+.primary-btn:hover {
+    background: var(--secondary-light);
+    color: white;
+}
+
+.primary-btn.logged-in {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
 .primary-btn.logged-in:hover {
     background: var(--primary-light);
     border-color: var(--primary-light);
@@ -298,21 +317,6 @@ ul {
     background: #f8fafc;
     border: 1px solid var(--border);
     color: var(--text-main);
-    transition: all 0.2s;
-    font-weight: 500;
-}
-
-.gray-btn:hover {
-    background: #e2e8f0;
-    border-color: #cbd5e1;
-}
-
-.gray-btn {
-    background: #f1f5f9;
-    border: 1px solid var(--border);
-    color: var(--text-main);
-    padding: 8px 20px;
-    border-radius: 6px;
     transition: all 0.2s;
     font-weight: 500;
 }
