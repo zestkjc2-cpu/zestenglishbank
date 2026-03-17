@@ -1379,8 +1379,8 @@ form .btn {
     background-color: #fff;
     padding: 60px 0 30px;
     border-top: 1px solid #eee;
-    font-size: 0.8125rem;
-    color: #000;
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
 .footer-info-row {
@@ -1411,7 +1411,7 @@ form .btn {
 }
 
 .footer-disclaimer {
-    color: #666;
+    color: var(--text-muted);
     margin-top: 20px;
     line-height: 1.6;
 }
