@@ -219,14 +219,14 @@
                             <div id="rotateInfo" class="control-panel" style="display: none;">
                                 <p><strong>선택된 파일:</strong> <span id="rotateFileName"></span></p>
                                 <div style="margin-top: 15px;">
-                                    <label>회전 각도:</label>
+                                    <label>추가로 회전할 각도:</label>
                                     <select id="rotateAngle" class="input-inline">
-                                        <option value="90">시계방향 90°</option>
-                                        <option value="180">180° 반전</option>
-                                        <option value="270">반시계방향 90° (270°)</option>
+                                        <option value="90">시계방향 90° 회전</option>
+                                        <option value="180">180° 반전 회전</option>
+                                        <option value="270">시계방향 270° 회전</option>
                                     </select>
                                 </div>
-                                <button id="runRotateBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px;">회전 후 다운로드 🚀</button>
+                                <button id="runRotateBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px;">회전 후 저장하기 💾</button>
                             </div>
                         </div>
                     </div>
@@ -308,11 +308,14 @@
                 const pdf = await PDFDocument.load(bytes);
                 const angle = parseInt(document.getElementById('rotateAngle').value);
                 const pages = pdf.getPages();
-                pages.forEach(p => p.setRotation(degrees(angle)));
+                pages.forEach(p => {
+                    const currentRotation = p.getRotation().angle;
+                    p.setRotation(degrees((currentRotation + angle) % 360));
+                });
                 const savedBytes = await pdf.save();
                 saveAs(new Blob([savedBytes]), selectedRotateFile.name.replace('.pdf', '_rotated.pdf'));
             } catch (err) { alert('오류: ' + err.message); }
-            finally { btn.disabled = false; btn.textContent = '회전 후 다운로드 🚀'; }
+            finally { btn.disabled = false; btn.textContent = '회전 후 저장하기 💾'; }
         });
 
         // --- Merge Logic ---
