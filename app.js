@@ -123,6 +123,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
             dynamicElements.forEach(el => el && el.classList.add('logged-in'));
+
+            // Inject Global Back Button (Left of Login/Logout)
+            const headerActions = document.querySelector('.header-actions');
+            if (headerActions && loginBtn && !document.getElementById('globalBackBtn')) {
+                const backBtn = document.createElement('a');
+                backBtn.id = 'globalBackBtn';
+                backBtn.href = 'javascript:history.back()';
+                backBtn.className = 'nav-link outline-link';
+                backBtn.style.marginRight = '12px';
+                backBtn.innerHTML = '← 뒤로가기';
+                headerActions.insertBefore(backBtn, loginBtn);
+            }
         } else {
             dynamicElements.forEach(el => el && el.classList.remove('logged-in'));
             // Auto open login modal if requested via URL
