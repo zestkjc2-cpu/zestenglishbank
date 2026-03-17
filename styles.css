@@ -1373,3 +1373,95 @@ form .btn {
         font-size: 1rem;
     }
 }
+
+/* Samsung-style Footer Styles */
+.footer {
+    background-color: #fff;
+    padding: 60px 0 30px;
+    border-top: 1px solid #eee;
+    font-size: 0.8125rem;
+    color: #000;
+}
+
+.footer-info-row {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 20px;
+    line-height: 1.8;
+}
+
+.footer-info-item {
+    display: flex;
+    align-items: center;
+}
+
+.footer-info-label {
+    margin-right: 4px;
+}
+
+.footer-info-value {
+    font-weight: 500;
+}
+
+.footer-link-btn {
+    text-decoration: underline;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.footer-disclaimer {
+    color: #666;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.copyright-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 20px;
+    font-weight: 600;
+}
+
+.footer-bottom-links a:hover {
+    text-decoration: underline;
+}
+
+.footer-bottom-links a.privacy-link {
+    color: #0381fe;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.social-icon-btn {
+    font-size: 1.25rem;
+    color: #000;
+    transition: transform 0.2s ease;
+}
+
+.social-icon-btn:hover {
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .copyright-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .footer-bottom-links {
+        flex-wrap: wrap;
+    }
+}
