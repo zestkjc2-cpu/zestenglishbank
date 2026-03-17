@@ -8,7 +8,11 @@ const questionsContainer = document.getElementById('questionsContainer');
 const exportBtn = document.getElementById('exportBtn');
 const optionCards = document.querySelectorAll('.option-card');
 
-let selectedTypes = ['blank']; // Default
+const showTypeDescBtn = document.getElementById('showTypeDesc');
+const typeDescModal = document.getElementById('typeDescModal');
+const closeModals = document.querySelectorAll('.close-modal');
+
+let selectedTypes = ['대의 파악']; // Default to first type
 let generatedData = [];
 
 // UI Sync with Auth State
@@ -24,14 +28,26 @@ async function syncUI() {
 }
 syncUI();
 
+// Modal Logic
+if (showTypeDescBtn) {
+    showTypeDescBtn.addEventListener('click', () => {
+        typeDescModal.classList.add('active');
+    });
+}
+
+closeModals.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const modal = btn.closest('.modal-overlay');
+        if (modal) modal.classList.remove('active');
+    });
+});
+
 // Handle Option Card Selection
 optionCards.forEach(card => {
     card.addEventListener('click', () => {
         const type = card.dataset.type;
         const checkbox = card.querySelector('input');
         
-        if (type === 'blank') return; // Blank is always required or handled specially
-
         card.classList.toggle('active');
         checkbox.checked = !checkbox.checked;
         

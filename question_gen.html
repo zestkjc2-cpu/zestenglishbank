@@ -174,27 +174,44 @@
                     <h3 style="margin-bottom: 15px;">1. 영어 지문 입력</h3>
                     <textarea class="passage-input" id="passageInput" placeholder="이곳에 영어 지문을 입력하거나 붙여넣으세요..."></textarea>
                     
-                    <h3 style="margin-bottom: 15px;">2. 생성할 문제 유형 선택</h3>
-                    <div class="options-grid">
-                        <div class="option-card active" data-type="blank">
-                            <input type="checkbox" checked readonly>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">2. 생성할 문제 유형 선택</h3>
+                        <button class="btn btn-outline" id="showTypeDesc" style="padding: 6px 12px; font-size: 0.85rem;">문제 유형 설명 💡</button>
+                    </div>
+                    <div class="options-grid" id="typeGrid">
+                        <div class="option-card active" data-type="대의 파악">
+                            <input type="checkbox" checked>
                             <div>
-                                <strong>빈칸 추론</strong>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">주요 어휘 빈칸 처리</p>
+                                <strong>대의 파악</strong>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">주제, 제목, 요지 등</p>
                             </div>
                         </div>
-                        <div class="option-card" data-type="grammar">
+                        <div class="option-card" data-type="논리적 흐름">
                             <input type="checkbox">
                             <div>
-                                <strong>어법 선택</strong>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">올바른 어법 고르기</p>
+                                <strong>논리적 흐름</strong>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">순서, 삽입, 무관한 문장</p>
                             </div>
                         </div>
-                        <div class="option-card" data-type="ordering">
+                        <div class="option-card" data-type="세부 정보 및 추론">
                             <input type="checkbox">
                             <div>
-                                <strong>문장 배열</strong>
-                                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">단어 순서 배열하기</p>
+                                <strong>세부 정보 및 추론</strong>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">내용 일치, 빈칸 추론</p>
+                            </div>
+                        </div>
+                        <div class="option-card" data-type="어법 및 어휘">
+                            <input type="checkbox">
+                            <div>
+                                <strong>어법 및 어휘</strong>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">밑줄 유형, 문맥 추론</p>
+                            </div>
+                        </div>
+                        <div class="option-card" data-type="서술형">
+                            <input type="checkbox">
+                            <div>
+                                <strong>서술형</strong>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">영작, 조건부 완성</p>
                             </div>
                         </div>
                     </div>
@@ -214,6 +231,91 @@
             </div>
         </div>
     </section>
+
+    <!-- Question Type Description Modal -->
+    <div class="modal-overlay" id="typeDescModal">
+        <div class="glass-modal modal-wide" style="padding: 30px; max-height: 85vh; overflow-y: auto; text-align: left;">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header" style="text-align: left; margin-bottom: 25px;">
+                <h2 style="color: var(--text-main); font-size: 1.6rem;">문제 유형 상세 설명</h2>
+                <p>제스트의 지능형 엔진이 생성하는 주요 문제 유형별 가이드입니다.</p>
+            </div>
+            
+            <div class="type-desc-content" style="line-height: 1.7; color: var(--text-main);">
+                <div style="margin-bottom: 25px;">
+                    <h4 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">1</span>
+                        대의 파악 (글의 전체 흐름 이해)
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">글이 전체적으로 무엇을 말하고자 하는지 묻는 가장 기본적인 유형입니다.</p>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• <strong>주제/제목/요지/주장 찾기:</strong> 글의 핵심 내용을 한 문장이나 구로 요약한 것을 고릅니다.</li>
+                        <li>• <strong>글의 목적:</strong> 이 글을 왜 썼는지(광고, 항의, 감사, 공지 등) 파악합니다.</li>
+                        <li>• <strong>심경 및 분위기:</strong> 필자나 주인공의 감정 상태, 또는 글 전체의 배경 분위기를 묻습니다.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h4 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">2</span>
+                        논리적 흐름 (문장 간의 연결성)
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">글의 전개 구조를 정확히 알고 있는지 평가하며, 변별력이 높은 구간입니다.</p>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• <strong>글의 순서 배열:</strong> 주어진 문장 다음에 이어질 글의 순서(A−B−C)를 맞춥니다.</li>
+                        <li>• <strong>문장 삽입:</strong> 특정한 문장이 들어갈 적절한 위치를 고릅니다.</li>
+                        <li>• <strong>무관한 문장 고르기:</strong> 흐름상 전체 주제와 상관없는 엉뚱한 문장을 찾아냅니다.</li>
+                        <li>• <strong>연결어 추론:</strong> 빈칸에 들어갈 접속사(However, Therefore, For example 등)를 고릅니다.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h4 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">3</span>
+                        세부 정보 및 추론 (꼼꼼한 독해)
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">지문을 얼마나 정확하게 해석했는지를 묻습니다.</p>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• <strong>내용 일치/불일치:</strong> 지문의 내용과 선택지의 설명이 맞는지 확인합니다. (한글/영어 선택지 혼용)</li>
+                        <li>• <strong>빈칸 추론:</strong> 글의 핵심 키워드나 결론 부분을 빈칸으로 뚫어놓고 채우게 합니다. (내신 최고 난이도)</li>
+                        <li>• <strong>함축 의미 추론 (Underlined Meaning):</strong> 밑줄 친 비유적 표현이 실제 본문에서 의미하는 바를 찾습니다.</li>
+                        <li>• <strong>지칭 추론:</strong> 대명사(it, they, he 등)가 가리키는 대상이 다른 하나를 찾습니다.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h4 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">4</span>
+                        어법 및 어휘 (기본기 측정)
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">단순 암기를 넘어 문법적 원리와 문맥을 이해해야 합니다.</p>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• <strong>어법상 어색한/적절한 것:</strong> 문법적으로 틀린 부분을 찾습니다. (밑줄형 또는 선택형)</li>
+                        <li>• <strong>문맥상 어색한/적절한 어휘:</strong> 흐름상 반의어가 쓰였거나 부적절한 단어를 찾습니다.</li>
+                        <li>• <strong>요약문 완성:</strong> 본문 내용을 한 문장으로 요약할 때 빈칸에 들어갈 적절한 단어를 본문에서 찾아 쓰거나 고릅니다.</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <h4 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">5</span>
+                        서술형 (내신 등급의 결정타)
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">직접 영작을 하거나 답안을 작성해야 하는 유형입니다.</p>
+                    <ul style="list-style: none; padding-left: 20px;">
+                        <li>• <strong>단어 배열 영작:</strong> 주어진 단어들을 문법에 맞게 나열하여 문장을 완성합니다. (조건 제시형이 많음)</li>
+                        <li>• <strong>조건부 영작:</strong> 특정 문법(예: 가정법, 도치 등)을 사용하여 문장을 완성합니다.</li>
+                        <li>• <strong>본문 단어 찾아 쓰기:</strong> 지문 속에서 특정 역할을 하는 단어를 찾아 원형 그대로 혹은 변형해서 씁니다.</li>
+                        <li>• <strong>우리말 해석 및 요약:</strong> 지문의 특정 부분의 의미를 우리말로 서술합니다.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                <button class="btn btn-gradient close-modal" style="padding: 10px 30px;">닫기</button>
+            </div>
+        </div>
+    </div>
 
     <script src="question_gen.js" type="module"></script>
 </body>
