@@ -125,7 +125,7 @@ function reconstructParagraphs(text) {
 /**
  * Process a list of items into grouped lines of text (paragraphs)
  */
-function processItemsToParagraphs(items, Paragraph, TextRun) {
+function processItemsToParagraphs(items, { Paragraph, TextRun }) {
     const lines = [];
     items.forEach(item => {
         const y = Math.round(item.transform[5]);
@@ -158,7 +158,7 @@ function processItemsToParagraphs(items, Paragraph, TextRun) {
         });
 
         paragraphs.push(new Paragraph({
-            children: [new TextRun({ text: lineText.trim(), size: 24 })],
+            children: [new TextRun({ text: lineText.trim(), size: 24, font: "Pretendard" })],
             spacing: { before: 200, after: 200 }
         }));
     });
