@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>제스트 영어 문제은행 - 자료실</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     <script>
-        (function() {
+        (function () {
             try {
                 const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
                 if (sessionStr) {
@@ -18,7 +20,7 @@
                         document.documentElement.classList.add('logged-in');
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
     <script type="module">
@@ -30,31 +32,108 @@
     </script>
     <style>
         .board-container {
-            max-width: 1000px; margin: 0 auto; background: var(--surface);
-            border-radius: 16px; padding: 30px; box-shadow: var(--shadow-lg);
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
         }
+
         .board-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border);
-            flex-wrap: wrap; gap: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .board-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .board-table { width: 100%; border-collapse: collapse; text-align: center; }
-        .board-table th, .board-table td { padding: 16px 12px; border-bottom: 1px solid var(--border); }
-        .board-table th { background: #f8fafc; color: var(--text-muted); font-weight: 600; font-size: 0.95rem; }
-        .board-table td.title-cell { text-align: left; font-weight: 500; color: var(--text-main); }
-        .board-table tr:hover { background: #f1f5f9; }
+
+        .board-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .board-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .board-table th,
+        .board-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .board-table th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .board-table td.title-cell {
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .board-table tr:hover {
+            background: #f1f5f9;
+        }
+
         .download-btn {
-            background: var(--surface); border: 1px solid var(--primary); color: var(--primary);
-            padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
         }
-        .download-btn:hover { background: var(--primary); color: white; }
-        .badge-type { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 8px; }
-        .badge-hwp { background: #e0f2fe; color: #0284c7; }
-        .badge-pdf { background: #fee2e2; color: #dc2626; }
-        .badge-docx { background: #f3e8ff; color: #7c3aed; }
-        .loading-msg { text-align: center; padding: 40px; color: var(--text-muted); }
+
+        .download-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .badge-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-hwp {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .badge-pdf {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-docx {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .loading-msg {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
 
         /* Admin Upload Panel */
         .admin-upload-panel {
@@ -64,35 +143,96 @@
             padding: 24px;
             margin-bottom: 28px;
         }
-        .admin-upload-panel h3 { margin-bottom: 16px; font-size: 1.1rem; color: var(--primary); }
-        .upload-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .admin-upload-panel h3 {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .upload-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
         .upload-row input[type="text"],
         .upload-row select,
         .upload-row input[type="file"] {
-            flex: 1; min-width: 160px; padding: 10px 12px;
-            border: 1px solid var(--border); border-radius: 8px;
-            font-size: 0.95rem; background: white; color: var(--text-main);
+            flex: 1;
+            min-width: 160px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-main);
         }
-        .status-msg { margin-top: 10px; font-size: 0.9rem; font-weight: 600; }
-        .status-msg.ok { color: #16a34a; }
-        .status-msg.err { color: #dc2626; }
+
+        .status-msg {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-msg.ok {
+            color: #16a34a;
+        }
+
+        .status-msg.err {
+            color: #dc2626;
+        }
+
         .admin-bar {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 16px; background: #dbeafe; border-radius: 8px;
-            margin-bottom: 16px; font-size: 0.9rem; color: var(--primary); font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #dbeafe;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
         }
-        .admin-bar button { font-size: 0.8rem; padding: 4px 12px; }
+
+        .admin-bar button {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+        }
+
         .delete-btn {
-            background: #fff1f2; color: #e11d48; border: 1px solid #fda4af;
-            padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; margin-left: 6px; display: inline-block;
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fda4af;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 6px;
+            display: inline-block;
             text-decoration: none;
         }
-        .delete-btn:hover { background: #e11d48; color: white; border-color: #e11d48; }
+
+        .delete-btn:hover {
+            background: #e11d48;
+            color: white;
+            border-color: #e11d48;
+        }
+
         .lock-btn {
-            background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;
-            padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; text-decoration: none; display: inline-block;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
         }
 
         /* Apple-Style Premium Landing Styles (Manual Only) */
@@ -100,12 +240,20 @@
             background: #fff !important;
             color: #1d1d1f !important;
         }
+
         .manual-premium-mode .header {
             background: rgba(255, 255, 255, 0.82);
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
-        .manual-premium-mode .zest-brand { color: #1d1d1f; }
-        .manual-premium-mode .nav-link.outline-link { border-color: rgba(0, 0, 0, 0.2); color: #1d1d1f; }
+
+        .manual-premium-mode .zest-brand {
+            color: #1d1d1f;
+        }
+
+        .manual-premium-mode .nav-link.outline-link {
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #1d1d1f;
+        }
 
         .premium-hero {
             height: 90vh;
@@ -123,6 +271,7 @@
             transform: translateY(30px);
             transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
         }
+
         .hero-reveal.visible {
             opacity: 1;
             transform: translateY(0);
@@ -165,12 +314,15 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         .feature-card.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .feature-card:hover { transform: scale(1.02); }
+        .feature-card:hover {
+            transform: scale(1.02);
+        }
 
         .feature-icon {
             font-size: 1.8rem;
@@ -207,18 +359,33 @@
             display: inline-block;
             transition: all 0.3s;
         }
-        .cta-pill:hover { transform: scale(1.05); background: #333; }
 
-        #traditionalBoard { display: block; }
-        #premiumManual { display: none; }
+        .cta-pill:hover {
+            transform: scale(1.05);
+            background: #333;
+        }
+
+        #traditionalBoard {
+            display: block;
+        }
+
+        #premiumManual {
+            display: none;
+        }
     </style>
 </head>
+
 <body style="background: var(--bg-color);">
     <header class="header">
         <div class="container nav-container">
             <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
                 <span class="zest-brand">ZEST ENGLISH BANK</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="home-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="home-icon">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
             </a>
             <nav class="main-nav">
                 <div class="header-actions">
@@ -256,7 +423,8 @@
                             </select>
                             <input type="file" id="fileInput" accept=".pdf,.hwp,.docx" required multiple>
                             <button type="submit" class="btn btn-gradient">업로드</button>
-                            <button type="button" class="btn btn-outline" id="deleteSelectedBtn" style="color: #e11d48; border-color: #fda4af;">선택 삭제</button>
+                            <button type="button" class="btn btn-outline" id="deleteSelectedBtn"
+                                style="color: #e11d48; border-color: #fda4af;">선택 삭제</button>
                         </div>
                         <p id="uploadStatus" class="status-msg"></p>
                     </form>
@@ -265,7 +433,8 @@
                 <div class="board-header">
                     <div class="board-title" id="boardCategoryTitle">자료실</div>
                     <div style="display:flex; gap:8px;">
-                        <input type="text" id="searchInput" placeholder="문서 검색..." style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;">
+                        <input type="text" id="searchInput" placeholder="문서 검색..."
+                            style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;">
                         <button class="btn btn-gradient" style="padding: 8px 16px;" id="searchBtn">검색</button>
                     </div>
                 </div>
@@ -273,7 +442,8 @@
                 <table class="board-table">
                     <thead>
                         <tr id="tableHeader">
-                            <th width="5%" id="checkCol" style="display:none;"><input type="checkbox" id="selectAll"></th>
+                            <th width="5%" id="checkCol" style="display:none;"><input type="checkbox" id="selectAll">
+                            </th>
                             <th width="8%">번호</th>
                             <th width="52%">제목</th>
                             <th width="15%">등록일</th>
@@ -281,7 +451,9 @@
                         </tr>
                     </thead>
                     <tbody id="boardContent">
-                        <tr><td colspan="4" class="loading-msg">📂 자료를 불러오는 중...</td></tr>
+                        <tr>
+                            <td colspan="4" class="loading-msg">📂 자료를 불러오는 중...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -292,11 +464,13 @@
     <section id="premiumManual">
         <div class="premium-hero">
             <div class="hero-reveal">
-                <h1 class="premium-title">ZEST ENGLISH BANK<br>현재와 미래를 잇는 교육의 Total Solution.</h1>
-                <p class="premium-subtitle">가장 진보된 인공지능이 당신의 학습 자료 제작 과정을 혁신합니다.<br>단순한 도구를 넘어, 지능형 창작 파트너가 되어드립니다.</p>
+                <h1 class="premium-title">ZEST ENGLISH BANK<br>현재와 미래를 잇는 교육의<br>Total Solution.</h1>
+                <p class="premium-subtitle">최고의 영어교육 전문가들이 당신의 학습 자료 제작 과정을 혁신합니다.<br>단순한 도구를 넘어, 지능형 창작 파트너가 되어드립니다.</p>
                 <div style="display:flex; gap:15px; justify-content:center;">
                     <a href="trial.html" class="cta-pill">자료실 바로가기</a>
-                    <a href="index.html" class="nav-link" style="color:#2997ff; font-weight:600; font-size:1.1rem; display:flex; align-items:center; gap:5px;">더 알아보기 <span>></span></a>
+                    <a href="index.html" class="nav-link"
+                        style="color:#2997ff; font-weight:600; font-size:1.1rem; display:flex; align-items:center; gap:5px;">더
+                        알아보기 <span>></span></a>
                 </div>
             </div>
         </div>
@@ -351,7 +525,7 @@
                 </div>
                 <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
                 <button type="submit" class="btn btn-gradient btn-full">로그인</button>
-                
+
                 <div class="social-login-divider">
                     <span>또는</span>
                 </div>
@@ -367,7 +541,9 @@
                     </button>
                 </div>
                 <div style="margin-top: 20px; text-align: center;">
-                    <a href="admin.html" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자 로그인</a>
+                    <a href="admin.html"
+                        style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자
+                        로그인</a>
                 </div>
             </form>
         </div>
@@ -390,7 +566,7 @@
             document.body.classList.add('manual-premium-mode');
             document.getElementById('traditionalBoard').style.display = 'none';
             document.getElementById('premiumManual').style.display = 'block';
-            
+
             // Intersection Observer for Reveal Animations
             const observerOptions = { threshold: 0.1 };
             const observer = new IntersectionObserver((entries) => {
@@ -465,7 +641,7 @@
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const currentTitle = (files.length === 1 && fileTitleInput) ? fileTitleInput : file.name.replace(/\.[^.]+$/, '');
-                
+
                 statusEl.textContent = `업로드 중 (${i + 1}/${files.length}): ${currentTitle}...`;
 
                 const safeName = sanitizeFileName(file.name);
@@ -477,7 +653,7 @@
                 if (storageError) {
                     statusEl.textContent = `저장 오류 (${file.name}): ` + storageError.message;
                     statusEl.className = 'status-msg err';
-                    break; 
+                    break;
                 }
 
                 const { error: dbError } = await supabase.from('files')
@@ -530,7 +706,7 @@
                 const tr = document.createElement('tr');
                 let actionHtml = '';
                 let checkHtml = '';
-                
+
                 if (session) {
                     actionHtml = `<a class="download-btn" href="${urlData.publicUrl}" download target="_blank">↓ 다운로드</a>`;
                     actionHtml += ` <button class="delete-btn" onclick="window.deleteFile('${file.id}', '${file.file_path}')">삭제</button>`;
@@ -596,7 +772,7 @@
         // Expose delete function to window for the onclick handler
         window.deleteFile = async (id, filePath) => {
             if (!confirm('정말 이 자료를 삭제하시겠습니까?')) return;
-            
+
             // Delete from Storage
             const { error: storageError } = await supabase.storage.from('documents').remove([filePath]);
             if (storageError) {
@@ -624,4 +800,5 @@
         });
     </script>
 </body>
+
 </html>
