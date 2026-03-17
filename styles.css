@@ -65,6 +65,7 @@ ul {
     transition: color 0.5s ease;
 }
 
+.logged-in .text-orange,
 .text-orange.logged-in {
     color: var(--primary);
     background: linear-gradient(to right, var(--primary), var(--primary-light));
@@ -152,11 +153,13 @@ ul {
     border-color: var(--secondary-light) !important;
 }
 
+.logged-in .auth-dynamic-btn,
 .auth-dynamic-btn.logged-in {
     background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
     border: 1px solid var(--primary) !important;
 }
 
+.logged-in .auth-dynamic-btn:hover,
 .auth-dynamic-btn.logged-in:hover {
     box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
     border-color: var(--primary-light) !important;
@@ -205,6 +208,7 @@ ul {
     transition: all 0.5s ease;
 }
 
+.logged-in .highlight,
 .highlight.logged-in {
     background: linear-gradient(to right, var(--primary), var(--primary-light));
     -webkit-background-clip: text;
@@ -223,6 +227,7 @@ ul {
     transition: all 0.5s ease;
 }
 
+.logged-in .zest-brand,
 .zest-brand.logged-in {
     background: linear-gradient(to right, var(--primary), var(--primary-light));
     -webkit-background-clip: text;

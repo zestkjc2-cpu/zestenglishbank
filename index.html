@@ -18,6 +18,21 @@
     <meta property="og:type" content="website" />
     <meta property="og:description" content="영어 문제은행, 온라인 테스트 및 시험지 출력을 한 번에... 단어학습, 리딩, 라이팅, 신텍스, 파닉스, 듣기 문제 제공" />
 
+    <!-- Fast-path session check to prevent color flash -->
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    if (session && session.access_token) {
+                        document.documentElement.classList.add('logged-in');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

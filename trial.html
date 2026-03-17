@@ -9,6 +9,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    if (session && session.access_token) {
+                        document.documentElement.classList.add('logged-in');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <script type="module">
         import { supabase } from './supabaseClient.js';
         const { data: { session: initialSession } } = await supabase.auth.getSession();

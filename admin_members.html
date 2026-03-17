@@ -8,6 +8,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    if (session && session.access_token) {
+                        document.documentElement.classList.add('logged-in');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         .board-container {
             max-width: 1000px; background: var(--surface);
@@ -67,20 +80,24 @@
                 <div id="setupGuide" class="setup-guide" style="display:none;">
                     <h3>⚠️ [안내] 회원 관리 기능을 위해 데이터베이스 설정이 필요합니다.</h3>
                     <p>현재 데이터베이스에 <strong><code>profiles</code></strong>(또는 유사한) 테이블이 없어 회원 목록을 불러올 수 없습니다. Supabase SQL Editor에서 아래 쿼리를 실행해 주시면 정상 작동합니다.</p>
-<pre><code>-- 1. profiles 테이블 생성 (이미 있으면 건너뜀)
+<pre><code>-- 1. profiles 테이블 생성 및 role 컬럼 추가
 create table if not exists public.profiles (
   id uuid references auth.users not null primary key,
   email text,
   full_name text,
+  role text default 'user', -- 'admin' or 'user'
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- 2. 새 회원가입 시 profiles 테이블에도 자동으로 레코드를 추가하는 함수 생성
+-- 만약 이미 profiles 테이블이 있다면 role 컬럼만 추가:
+-- alter table public.profiles add column if not exists role text default 'user';
+
+-- 2. 새 회원가입 시 profiles 자동 생성 함수
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email)
-  values (new.id, new.email)
+  insert into public.profiles (id, email, role)
+  values (new.id, new.email, 'user')
   on conflict (id) do nothing;
   return new;
 end;
@@ -103,8 +120,9 @@ on conflict (id) do nothing;
                     <thead>
                         <tr>
                             <th width="10%">번호</th>
-                            <th width="40%">이메일 (ID)</th>
-                            <th width="30%">이름/학원명</th>
+                            <th width="30%">이메일 (ID)</th>
+                            <th width="20%">이름/학원명</th>
+                            <th width="20%">구분 (Role)</th>
                             <th width="20%">가입일자</th>
                         </tr>
                     </thead>
@@ -139,6 +157,24 @@ on conflict (id) do nothing;
                 .select('*')
                 .order('created_at', { ascending: false });
 
+            window.handleRoleUpdate = async (userId, currentRole) => {
+                const newRole = currentRole === 'admin' ? 'user' : 'admin';
+                const confirmMsg = `해당 회원을 ${newRole === 'admin' ? '관리자' : '일반유저'}로 변경하시겠습니까?`;
+                if (!confirm(confirmMsg)) return;
+
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ role: newRole })
+                    .eq('id', userId);
+
+                if (error) {
+                    alert('권한 변경 실패: ' + error.message);
+                } else {
+                    alert('변경되었습니다.');
+                    loadMembers();
+                }
+            };
+
             if (error) {
                 // If profiles table doesn't exist, Supabase will return code 42P01
                 if (error.code === 'PGRST204' || error.message.includes('relation "public.profiles" does not exist')) {
@@ -159,12 +195,19 @@ on conflict (id) do nothing;
             data.forEach((member, i) => {
                 const date = new Date(member.created_at).toLocaleDateString('ko-KR');
                 const nameStr = member.full_name || '-';
+                const roleStr = member.role === 'admin' ? '🔴 관리자' : '⚪ 유저';
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
                     <td>${data.length - i}</td>
                     <td class="title-cell">${member.email}</td>
                     <td>${nameStr}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
+                            <span>${roleStr}</span>
+                            <button onclick="handleRoleUpdate('${member.id}', '${member.role || 'user'}')" class="btn" style="padding:4px 8px; font-size:0.8rem; border:1px solid var(--border);">변경</button>
+                        </div>
+                    </td>
                     <td>${date}</td>
                 `;
                 tbody.appendChild(tr);
