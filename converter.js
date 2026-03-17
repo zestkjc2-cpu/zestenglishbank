@@ -175,25 +175,42 @@ function processItemsToParagraphs(items, docxComponents) {
 
 /**
  * Smart extraction for exam questions:
- * 1. Filters out headers/footers (top 10% / bottom 10%)
- * 2. Groups items into "Question Blocks" starting with "1.", "2.", "3.", etc.
+ * 1. Handles 2-column split internally
+ * 2. Filters out headers/footers
+ * 3. Groups items into "Question Blocks" starting with "1.", "2.", "3.", etc.
  */
 async function extractQuestionBlocks(page, docxComponents) {
-    const { Paragraph, TextRun } = docxComponents;
     const viewport = page.getViewport({ scale: 1.0 });
     const content = await page.getTextContent();
     const items = content.items;
     
-    // Noise filtering (Y-axis)
-    const topLimit = viewport.height * 0.90; // pdf.js Y=0 is bottom
-    const bottomLimit = viewport.height * 0.10;
+    if (items.length === 0) return [];
+
+    const midX = viewport.width / 2;
+    const leftItems = items.filter(it => it.transform[4] < midX);
+    const rightItems = items.filter(it => it.transform[4] >= midX);
+
+    const leftParas = getBlocksFromItems(leftItems, viewport.height, docxComponents);
+    const rightParas = getBlocksFromItems(rightItems, viewport.height, docxComponents);
+
+    return [...leftParas, ...rightParas];
+}
+
+function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
+    if (items.length === 0) return [];
+
+    // Noise filtering (Y-axis) - slightly more generous range
+    const topLimit = pageHeight * 0.95; 
+    const bottomLimit = pageHeight * 0.05;
     
     const filtered = items.filter(it => {
         const y = it.transform[5];
-        return y < topLimit && y > bottomLimit;
+        return y < topLimit && y > bottomLimit && it.str.trim().length > 0;
     });
 
-    // Grouping by Y-lines first
+    if (filtered.length === 0) return [];
+
+    // Grouping by Y-lines
     const lines = [];
     filtered.forEach(it => {
         const y = Math.round(it.transform[5]);
@@ -209,13 +226,14 @@ async function extractQuestionBlocks(page, docxComponents) {
     const blocks = [];
     let currentBlock = [];
 
-    // Simple heuristic for question start: "Number." at beginning of line
-    const questionStartRegex = /^[0-9]{1,2}[\.\)]/;
+    // Enhanced heuristic: "1.", "1)", "1-2.", "[1-5]" etc.
+    const questionStartRegex = /^([0-9]{1,3}[\.\)]|\[[0-9]{1,3}([-~][0-9]{1,3})?\]|◈|◆|Q\d+)/;
 
     lines.forEach(line => {
         line.items.sort((a, b) => a.x - b.x);
-        const lineText = line.items.map(it => it.text).join(" ").trim();
-        
+        const lineText = line.items.map(it => it.text).join(" ").replace(/\s+/g, ' ').trim();
+        if (!lineText) return;
+
         if (questionStartRegex.test(lineText)) {
             if (currentBlock.length > 0) blocks.push(currentBlock);
             currentBlock = [lineText];
@@ -225,7 +243,6 @@ async function extractQuestionBlocks(page, docxComponents) {
     });
     if (currentBlock.length > 0) blocks.push(currentBlock);
 
-    // Convert blocks to Paragraphs
     const paras = [];
     blocks.forEach(block => {
         block.forEach((line, idx) => {
@@ -234,7 +251,7 @@ async function extractQuestionBlocks(page, docxComponents) {
                     text: line, 
                     font: "Pretendard", 
                     size: 24,
-                    bold: idx === 0 // Bold the first line (question line)
+                    bold: idx === 0 
                 })],
                 spacing: { before: idx === 0 ? 400 : 80, after: 80 }
             }));
@@ -361,16 +378,23 @@ convertBtn.addEventListener('click', async () => {
                 });
             }
         } else if (convMode === 'smart') {
+            let totalQuestions = 0;
             for (let i = 1; i <= totalPages; i++) {
                 if (abortController.signal.aborted) throw new Error('CANCELED');
                 statusText.textContent = `스마트 문제 추출 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
                 const page = await pdf.getPage(i);
                 const paras = await extractQuestionBlocks(page, { Paragraph, TextRun });
-                docSections.push({ 
-                    properties: { page: { margin: NARROW_MARGINS } },
-                    children: paras 
-                });
+                if (paras.length > 0) {
+                    totalQuestions += (paras.length / 2); // Roughly
+                    docSections.push({ 
+                        properties: { page: { margin: NARROW_MARGINS } },
+                        children: paras 
+                    });
+                }
+            }
+            if (docSections.length === 0) {
+                throw new Error('텍스트를 찾을 수 없습니다. 이미지가 포함된 PDF라면 [OCR] 모드를 사용해 보세요.');
             }
         } else {
             for (let i = 1; i <= totalPages; i++) {
