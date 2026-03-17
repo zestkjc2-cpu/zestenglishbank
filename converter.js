@@ -13,6 +13,7 @@ const progressBar = document.getElementById('progressBar');
 const statusText = document.getElementById('statusText');
 
 let currentFile = null;
+let abortController = null;
 
 // UI Sync with Auth State
 async function syncUI() {
@@ -77,6 +78,11 @@ function handleFile(file) {
     fileInfo.style.display = 'flex';
     document.getElementById('modeSelection').style.display = 'flex';
     convertBtn.style.display = 'block';
+    
+    // Reset button state
+    convertBtn.classList.remove('btn-stop');
+    convertBtn.textContent = '워드 파일(DOCX)로 변환하기 🚀';
+    
     resetProgress();
 }
 
@@ -116,91 +122,83 @@ function reconstructParagraphs(text) {
     return reconstructed;
 }
 
-convertBtn.addEventListener('click', async () => {
-    if (!currentFile) return;
-
-    const convMode = document.querySelector('input[name="convMode"]:checked').value;
-    convertBtn.disabled = true;
-    convertBtn.textContent = '변환 중...';
-    progressContainer.style.display = 'block';
-    statusText.textContent = 'PDF 준비 중...';
-
-    try {
-        const arrayBuffer = await currentFile.arrayBuffer();
-        
-        if (typeof pdfjsLib === 'undefined') {
-            throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
-        }
-
-        const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
-        if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
-        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
-
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const totalPages = pdf.numPages;
-        const docSections = [];
-
 /**
- * Process a list of items into lines and paragraphs
+ * Process a list of items into grouped lines of text (paragraphs)
  */
-function processItemsToParagraphs(items, docxLib) {
-    const { Paragraph, TextRun } = docxLib;
+function processItemsToParagraphs(items, Paragraph, TextRun) {
     const lines = [];
     items.forEach(item => {
         const y = Math.round(item.transform[5]);
-        const fontSize = Math.abs(item.transform[0]);
         const x = item.transform[4];
         let line = lines.find(l => Math.abs(l.y - y) < 4);
         if (!line) {
             line = { y: y, items: [] };
             lines.push(line);
         }
-        line.items.push({ text: item.str, x: x, width: item.width, fontSize: fontSize });
+        line.items.push({ text: item.str, x: x, width: item.width });
     });
 
     lines.sort((a, b) => b.y - a.y);
-    return lines.map(line => {
+    const paragraphs = [];
+    lines.forEach(line => {
         line.items.sort((a, b) => a.x - b.x);
-        const children = [];
-        let currentText = "";
+        let lineText = "";
         let lastX = -1;
-        let lastFS = 10;
 
         line.items.forEach(it => {
             const gap = lastX !== -1 ? (it.x - lastX) : 0;
             if (gap > 60) {
-                if (currentText) children.push(new TextRun({ text: currentText.trim() + "   ", size: Math.round(lastFS * 2), font: "Pretendard" }));
-                currentText = it.text;
+                lineText += "   " + it.text;
             } else if (gap > 2) {
-                currentText += " " + it.text;
+                lineText += " " + it.text;
             } else {
-                currentText += it.text;
+                lineText += it.text;
             }
             lastX = it.x + it.width;
-            lastFS = it.fontSize;
         });
-        if (currentText) children.push(new TextRun({ text: currentText.trim(), size: Math.round(lastFS * 2), font: "Pretendard" }));
-        return new Paragraph({ children: children, spacing: { before: 80, after: 80 } });
+
+        paragraphs.push(new Paragraph({
+            children: [new TextRun({ text: lineText.trim(), size: 24 })],
+            spacing: { before: 200, after: 200 }
+        }));
     });
+    return paragraphs;
 }
 
 convertBtn.addEventListener('click', async () => {
     if (!currentFile) return;
 
+    // IF ALREADY CONVERTING -> STOP/CANCEL
+    if (abortController) {
+        abortController.abort();
+        statusText.textContent = '변환이 중단되었습니다.';
+        convertBtn.textContent = '다시 변환하기 🚀';
+        convertBtn.classList.remove('btn-stop');
+        progressBar.style.width = '0%';
+        abortController = null;
+        return;
+    }
+
     const convMode = document.querySelector('input[name="convMode"]:checked').value;
-    convertBtn.disabled = true;
-    convertBtn.textContent = '변환 중...';
+    
+    // Start Conversion Flow
+    abortController = new AbortController();
+    convertBtn.textContent = '중단하기 (취소) ⏹️';
+    convertBtn.classList.add('btn-stop');
+    convertBtn.disabled = false; // Keep enabled for cancellation
+    
     progressContainer.style.display = 'block';
     statusText.textContent = 'PDF 준비 중...';
 
     try {
         const arrayBuffer = await currentFile.arrayBuffer();
+        
         if (typeof pdfjsLib === 'undefined') throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
         const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
         if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
         const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
 
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, signal: abortController.signal }).promise;
         const totalPages = pdf.numPages;
         const docSections = [];
 
@@ -209,6 +207,8 @@ convertBtn.addEventListener('click', async () => {
             const worker = await Tesseract.createWorker('kor+eng');
             
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
+                
                 statusText.textContent = `페이지 OCR 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
@@ -220,7 +220,6 @@ convertBtn.addEventListener('click', async () => {
                 canvas.width = viewport.width;
                 await page.render({ canvasContext: context, viewport: viewport }).promise;
                 
-                // For OCR, splitting into two columns ensures better line recognition
                 const midX = canvas.width / 2;
                 const columns = [
                     { x: 0, y: 0, w: midX, h: canvas.height },
@@ -229,6 +228,7 @@ convertBtn.addEventListener('click', async () => {
 
                 const pageParas = [];
                 for (const col of columns) {
+                    if (abortController.signal.aborted) break;
                     const colCanvas = document.createElement('canvas');
                     colCanvas.width = col.w;
                     colCanvas.height = col.h;
@@ -249,6 +249,7 @@ convertBtn.addEventListener('click', async () => {
             await worker.terminate();
         } else if (convMode === 'column') {
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
                 statusText.textContent = `2단 분리 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
@@ -265,20 +266,22 @@ convertBtn.addEventListener('click', async () => {
                 });
 
                 const paras = [
-                    ...processItemsToParagraphs(leftItems, { Paragraph, TextRun }),
-                    ...processItemsToParagraphs(rightItems, { Paragraph, TextRun })
+                    ...processItemsToParagraphs(leftItems, { Document, Packer, Paragraph, TextRun }),
+                    ...processItemsToParagraphs(rightItems, { Document, Packer, Paragraph, TextRun })
                 ];
                 docSections.push({ children: paras });
             }
         } else {
-            // Standard Layout Mode
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
                 statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
                 const page = await pdf.getPage(i);
-                docSections.push({ children: processItemsToParagraphs((await page.getTextContent()).items, { Paragraph, TextRun }) });
+                docSections.push({ children: processItemsToParagraphs((await page.getTextContent()).items, { Document, Packer, Paragraph, TextRun }) });
             }
         }
+
+        if (abortController.signal.aborted) throw new Error('CANCELED');
 
         const doc = new Document({ sections: docSections });
         const blob = await Packer.toBlob(doc);
@@ -288,18 +291,17 @@ convertBtn.addEventListener('click', async () => {
         progressBar.style.width = '100%';
         statusText.textContent = '변환 완료!';
         convertBtn.textContent = '다시 변환하기';
-        convertBtn.disabled = false;
+        convertBtn.classList.remove('btn-stop');
     } catch (error) {
-        console.error(error);
-        statusText.textContent = `오류: ${error.message}`;
-        convertBtn.disabled = false;
-        convertBtn.textContent = '다시 시도 🚀';
-    }
-});
-    } catch (error) {
-        console.error(error);
-        statusText.textContent = `오류: ${error.message}`;
-        convertBtn.disabled = false;
-        convertBtn.textContent = '다시 시도 🚀';
+        if (error.message === 'CANCELED' || (error.name === 'AbortError')) {
+            console.log('Conversion Aborted');
+        } else {
+            console.error(error);
+            statusText.textContent = `오류: ${error.message}`;
+            convertBtn.textContent = '다시 시도 🚀';
+            convertBtn.classList.remove('btn-stop');
+        }
+    } finally {
+        abortController = null;
     }
 });

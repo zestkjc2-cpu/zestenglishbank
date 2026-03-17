@@ -13,6 +13,7 @@ const progressBar = document.getElementById('progressBar');
 const statusText = document.getElementById('statusText');
 
 let currentFile = null;
+let abortController = null;
 
 async function syncUI() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -37,6 +38,10 @@ function handleFile(file) {
     defaultContent.style.display = 'none';
     fileInfo.style.display = 'flex';
     convertBtn.style.display = 'block';
+    
+    // Reset button state
+    convertBtn.classList.remove('btn-stop');
+    convertBtn.textContent = '한글 파일(HWPX)로 변환하기 🚀';
     
     // Show mode selection
     const modeSelection = document.getElementById('modeSelection');
@@ -124,16 +129,32 @@ function processItemsToText(items) {
 convertBtn.addEventListener('click', async () => {
     if (!currentFile) return;
 
+    // IF ALREADY CONVERTING -> STOP/CANCEL
+    if (abortController) {
+        abortController.abort();
+        statusText.textContent = '변환이 중단되었습니다.';
+        convertBtn.textContent = '다시 변환하기 🚀';
+        convertBtn.classList.remove('btn-stop');
+        progressBar.style.width = '0%';
+        abortController = null;
+        return;
+    }
+
     const convMode = document.querySelector('input[name="convMode"]:checked').value;
-    convertBtn.disabled = true;
-    convertBtn.textContent = '변환 중...';
+    
+    // Start Conversion Flow
+    abortController = new AbortController();
+    convertBtn.textContent = '중단하기 (취소) ⏹️';
+    convertBtn.classList.add('btn-stop');
+    convertBtn.disabled = false; // Keep enabled for cancellation
+
     progressContainer.style.display = 'block';
     statusText.textContent = 'PDF 준비 중...';
 
     try {
         const arrayBuffer = await currentFile.arrayBuffer();
         if (typeof pdfjsLib === 'undefined') throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, signal: abortController.signal }).promise;
         const totalPages = pdf.numPages;
         let finalOutput = "";
 
@@ -142,6 +163,8 @@ convertBtn.addEventListener('click', async () => {
             const worker = await Tesseract.createWorker('kor+eng');
             
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
+
                 statusText.textContent = `페이지 OCR 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
@@ -161,6 +184,7 @@ convertBtn.addEventListener('click', async () => {
                 ];
 
                 for (const col of columns) {
+                    if (abortController.signal.aborted) break;
                     const colCanvas = document.createElement('canvas');
                     colCanvas.width = col.w;
                     colCanvas.height = col.h;
@@ -176,6 +200,7 @@ convertBtn.addEventListener('click', async () => {
             await worker.terminate();
         } else if (convMode === 'column') {
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
                 statusText.textContent = `2단 분리 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
@@ -199,6 +224,7 @@ convertBtn.addEventListener('click', async () => {
         } else {
             // Standard Layout Mode
             for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
                 statusText.textContent = `페이지 추출 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
                 const page = await pdf.getPage(i);
@@ -207,6 +233,8 @@ convertBtn.addEventListener('click', async () => {
             }
         }
 
+        if (abortController.signal.aborted) throw new Error('CANCELED');
+
         const blob = new Blob([finalOutput], { type: 'text/plain;charset=utf-8' });
         const suffixMap = { layout: "_Extracted.hwpx", column: "_2Column.hwpx", ocr: "_OCR.hwpx" };
         saveAs(blob, currentFile.name.replace('.pdf', '') + (suffixMap[convMode] || ".hwpx"));
@@ -214,11 +242,17 @@ convertBtn.addEventListener('click', async () => {
         progressBar.style.width = '100%';
         statusText.textContent = '변환 완료! (텍스트 기반 HWPX)';
         convertBtn.textContent = '다시 변환하기';
-        convertBtn.disabled = false;
+        convertBtn.classList.remove('btn-stop');
     } catch (error) {
-        console.error(error);
-        statusText.textContent = `오류 발생: ${error.message}`;
-        convertBtn.disabled = false;
-        convertBtn.textContent = '다시 시도 🚀';
+        if (error.message === 'CANCELED' || (error.name === 'AbortError')) {
+            console.log('Conversion Aborted');
+        } else {
+            console.error(error);
+            statusText.textContent = `오류 발생: ${error.message}`;
+            convertBtn.textContent = '다시 시도 🚀';
+            convertBtn.classList.remove('btn-stop');
+        }
+    } finally {
+        abortController = null;
     }
 });

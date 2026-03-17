@@ -742,6 +742,18 @@ ul {
     height: 40px;
 }
 
+.btn-stop {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: white !important;
+}
+
+.btn-stop:hover {
+    background: #dc2626 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
 .mockup-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
