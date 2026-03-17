@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (session) {
             window.location.href = url;
         } else {
-            alert('로그인이 필요한 서비스입니다.');
+            showZestAlert('로그인이 필요한 서비스입니다.');
             openModal(loginModal);
         }
     }
@@ -100,11 +100,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             document.getElementById('confirmLogout').addEventListener('click', async () => {
-                const { error } = await supabase.auth.signOut();
-                if (error) alert('로그아웃 오류: ' + error.message);
-                else window.location.href = 'index.html';
+                await supabase.auth.signOut();
+                window.location.reload();
             });
         }
+
+        // ── Custom Alert Modal Helper ──────────────────────────────────────────
+        window.showZestAlert = function(message) {
+            let alertModal = document.getElementById('zestAlertModal');
+            if (!alertModal) {
+                const modalHtml = `
+                    <div class="modal-overlay" id="zestAlertModal">
+                        <div class="glass-modal modal-mini" style="text-align: center;">
+                            <div class="modal-header" style="margin-bottom: 20px;">
+                                <h2 style="color: var(--text-main); font-size: 1.4rem;">알림</h2>
+                                <p id="zestAlertMessage">${message}</p>
+                            </div>
+                            <div class="modal-actions-row">
+                                <button class="btn auth-dynamic-btn" id="confirmZestAlert" style="width: 100%;">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                alertModal = document.getElementById('zestAlertModal');
+                document.getElementById('confirmZestAlert').addEventListener('click', () => {
+                    alertModal.classList.remove('active');
+                });
+            } else {
+                document.getElementById('zestAlertMessage').innerText = message;
+            }
+            
+            // Show it
+            setTimeout(() => alertModal.classList.add('active'), 10);
+        };
 
         // All elements that should toggle Orange -> Indigo
         const dynamicElements = [
@@ -143,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('login') === 'true') {
                 setTimeout(() => {
-                    alert('로그인이 필요한 서비스입니다.');
+                    showZestAlert('로그인이 필요한 서비스입니다.');
                     openModal(loginModal);
                 }, 500);
             }
@@ -355,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const loginModal = document.getElementById('loginModal');
                 if (loginModal) {
-                    alert('로그인이 필요한 서비스입니다.');
+                    showZestAlert('로그인이 필요한 서비스입니다.');
                     loginModal.classList.add('active');
                 }
             }
