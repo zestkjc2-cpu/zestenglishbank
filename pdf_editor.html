@@ -35,15 +35,15 @@
 
     <style>
         .editor-container {
-            max-width: 900px;
+            max-width: 650px;
             margin: 0 auto;
             padding: 40px 20px;
         }
 
         .tool-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
             margin-top: 30px;
         }
 
@@ -51,12 +51,12 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 30px;
+            padding: 24px 16px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             position: relative;
             text-align: center;
         }
@@ -68,19 +68,20 @@
         }
 
         .tool-icon {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
+            font-size: 1.8rem;
+            margin-bottom: 2px;
         }
 
         .tool-title {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 700;
         }
 
         .tool-desc {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             line-height: 1.5;
+            word-break: keep-all;
         }
 
         .active-tool-area {
