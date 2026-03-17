@@ -16,7 +16,7 @@ async function syncUI() {
     const { data: { session } } = await supabase.auth.getSession();
     const dynamicElements = [
         document.querySelector('.zest-brand'),
-        document.querySelector('.text-orange')
+        ...document.querySelectorAll('.text-orange')
     ];
     if (session) {
         dynamicElements.forEach(el => el && el.classList.add('logged-in'));

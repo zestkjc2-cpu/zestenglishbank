@@ -140,6 +140,9 @@ ul {
     background: linear-gradient(135deg, var(--secondary), #ea580c) !important;
     color: var(--white) !important;
     border: 1px solid var(--secondary) !important;
+    border-radius: 8px !important;
+    padding: 10px 22px !important;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
 }
 
@@ -358,6 +361,9 @@ ul {
     background: #f8fafc;
     border: 1px solid var(--border);
     color: var(--text-main);
+    border-radius: 8px !important;
+    padding: 10px 22px !important;
+    font-size: 0.95rem;
     transition: all 0.2s;
     font-weight: 500;
 }
