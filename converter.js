@@ -140,6 +140,70 @@ convertBtn.addEventListener('click', async () => {
         const totalPages = pdf.numPages;
         const docSections = [];
 
+/**
+ * Process a list of items into lines and paragraphs
+ */
+function processItemsToParagraphs(items, docxLib) {
+    const { Paragraph, TextRun } = docxLib;
+    const lines = [];
+    items.forEach(item => {
+        const y = Math.round(item.transform[5]);
+        const fontSize = Math.abs(item.transform[0]);
+        const x = item.transform[4];
+        let line = lines.find(l => Math.abs(l.y - y) < 4);
+        if (!line) {
+            line = { y: y, items: [] };
+            lines.push(line);
+        }
+        line.items.push({ text: item.str, x: x, width: item.width, fontSize: fontSize });
+    });
+
+    lines.sort((a, b) => b.y - a.y);
+    return lines.map(line => {
+        line.items.sort((a, b) => a.x - b.x);
+        const children = [];
+        let currentText = "";
+        let lastX = -1;
+        let lastFS = 10;
+
+        line.items.forEach(it => {
+            const gap = lastX !== -1 ? (it.x - lastX) : 0;
+            if (gap > 60) {
+                if (currentText) children.push(new TextRun({ text: currentText.trim() + "   ", size: Math.round(lastFS * 2), font: "Pretendard" }));
+                currentText = it.text;
+            } else if (gap > 2) {
+                currentText += " " + it.text;
+            } else {
+                currentText += it.text;
+            }
+            lastX = it.x + it.width;
+            lastFS = it.fontSize;
+        });
+        if (currentText) children.push(new TextRun({ text: currentText.trim(), size: Math.round(lastFS * 2), font: "Pretendard" }));
+        return new Paragraph({ children: children, spacing: { before: 80, after: 80 } });
+    });
+}
+
+convertBtn.addEventListener('click', async () => {
+    if (!currentFile) return;
+
+    const convMode = document.querySelector('input[name="convMode"]:checked').value;
+    convertBtn.disabled = true;
+    convertBtn.textContent = '변환 중...';
+    progressContainer.style.display = 'block';
+    statusText.textContent = 'PDF 준비 중...';
+
+    try {
+        const arrayBuffer = await currentFile.arrayBuffer();
+        if (typeof pdfjsLib === 'undefined') throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
+        const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
+        if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
+        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
+
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const totalPages = pdf.numPages;
+        const docSections = [];
+
         if (convMode === 'ocr') {
             statusText.textContent = 'OCR 엔진 초기화 중 (한글/영어)...';
             const worker = await Tesseract.createWorker('kor+eng');
@@ -149,83 +213,89 @@ convertBtn.addEventListener('click', async () => {
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 2.5 }); // High DPI for OCR
+                const viewport = page.getViewport({ scale: 2.5 });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-
                 await page.render({ canvasContext: context, viewport: viewport }).promise;
                 
-                const { data: { text } } = await worker.recognize(canvas);
-                const cleanedParas = reconstructParagraphs(text);
+                // For OCR, splitting into two columns ensures better line recognition
+                const midX = canvas.width / 2;
+                const columns = [
+                    { x: 0, y: 0, w: midX, h: canvas.height },
+                    { x: midX, y: 0, w: midX, h: canvas.height }
+                ];
 
-                docSections.push({
-                    children: cleanedParas.map(para => new Paragraph({
-                        children: [new TextRun({ text: para, font: "Pretendard" })],
-                        spacing: { before: 200, after: 200 }
-                    }))
-                });
+                const pageParas = [];
+                for (const col of columns) {
+                    const colCanvas = document.createElement('canvas');
+                    colCanvas.width = col.w;
+                    colCanvas.height = col.h;
+                    const colCtx = colCanvas.getContext('2d');
+                    colCtx.drawImage(canvas, col.x, col.y, col.w, col.h, 0, 0, col.w, col.h);
+                    
+                    const { data: { text } } = await worker.recognize(colCanvas);
+                    const cleaned = reconstructParagraphs(text);
+                    cleaned.forEach(p => {
+                        pageParas.push(new Paragraph({
+                            children: [new TextRun({ text: p, font: "Pretendard" })],
+                            spacing: { before: 200, after: 200 }
+                        }));
+                    });
+                }
+                docSections.push({ children: pageParas });
             }
             await worker.terminate();
-        } else {
-            // Layout Mode
+        } else if (convMode === 'column') {
             for (let i = 1; i <= totalPages; i++) {
-                statusText.textContent = `페이지 레이아웃 분석 중 (${i} / ${totalPages})...`;
+                statusText.textContent = `2단 분리 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
                 const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 1.0 });
+                const midX = viewport.width / 2;
                 const textContent = await page.getTextContent();
                 
-                const lines = [];
+                const leftItems = [];
+                const rightItems = [];
                 textContent.items.forEach(item => {
-                    const y = Math.round(item.transform[5]);
-                    const fontSize = Math.abs(item.transform[0]); 
-                    const x = item.transform[4];
-                    let line = lines.find(l => Math.abs(l.y - y) < 4);
-                    if (!line) {
-                        line = { y: y, items: [] };
-                        lines.push(line);
-                    }
-                    line.items.push({ text: item.str, x: x, width: item.width, fontSize: fontSize });
+                    if (item.transform[4] < midX) leftItems.push(item);
+                    else rightItems.push(item);
                 });
 
-                lines.sort((a, b) => b.y - a.y);
-                const pageParagraphs = lines.map(line => {
-                    line.items.sort((a, b) => a.x - b.x);
-                    const children = [];
-                    let currentText = "";
-                    let lastX = -1;
-                    let lastFS = 10;
-
-                    line.items.forEach(it => {
-                        const gap = lastX !== -1 ? (it.x - lastX) : 0;
-                        if (gap > 60) {
-                            if (currentText) children.push(new TextRun({ text: currentText.trim() + "   ", size: Math.round(lastFS * 2), font: "Pretendard" }));
-                            currentText = it.text;
-                        } else if (gap > 2) {
-                            currentText += " " + it.text;
-                        } else {
-                            currentText += it.text;
-                        }
-                        lastX = it.x + it.width;
-                        lastFS = it.fontSize;
-                    });
-                    if (currentText) children.push(new TextRun({ text: currentText.trim(), size: Math.round(lastFS * 2), font: "Pretendard" }));
-                    return new Paragraph({ children: children, spacing: { before: 80, after: 80 } });
-                });
-                docSections.push({ children: pageParagraphs });
+                const paras = [
+                    ...processItemsToParagraphs(leftItems, { Paragraph, TextRun }),
+                    ...processItemsToParagraphs(rightItems, { Paragraph, TextRun })
+                ];
+                docSections.push({ children: paras });
+            }
+        } else {
+            // Standard Layout Mode
+            for (let i = 1; i <= totalPages; i++) {
+                statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
+                progressBar.style.width = `${(i / totalPages) * 90}%`;
+                const page = await pdf.getPage(i);
+                docSections.push({ children: processItemsToParagraphs((await page.getTextContent()).items, { Paragraph, TextRun }) });
             }
         }
 
         const doc = new Document({ sections: docSections });
         const blob = await Packer.toBlob(doc);
-        saveAs(blob, currentFile.name.replace('.pdf', '') + (convMode === 'ocr' ? "_OCR_Text.docx" : "_Layout.docx"));
+        const suffixMap = { layout: "_Layout.docx", column: "_2Column.docx", ocr: "_OCR.docx" };
+        saveAs(blob, currentFile.name.replace('.pdf', '') + (suffixMap[convMode] || ".docx"));
 
         progressBar.style.width = '100%';
         statusText.textContent = '변환 완료!';
         convertBtn.textContent = '다시 변환하기';
         convertBtn.disabled = false;
+    } catch (error) {
+        console.error(error);
+        statusText.textContent = `오류: ${error.message}`;
+        convertBtn.disabled = false;
+        convertBtn.textContent = '다시 시도 🚀';
+    }
+});
     } catch (error) {
         console.error(error);
         statusText.textContent = `오류: ${error.message}`;
