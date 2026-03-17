@@ -64,18 +64,45 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!btn) return;
             if (isLogout) {
                 btn.innerHTML = text;
-                btn.onclick = async (e) => {
+                btn.onclick = (e) => {
                     e.preventDefault();
-                    if (confirm('로그아웃 하시겠습니까?')) {
-                        const { error } = await supabase.auth.signOut();
-                        if (error) alert('로그아웃 오류: ' + error.message);
-                        else window.location.href = 'index.html';
-                    }
+                    injectLogoutModal();
+                    document.getElementById('logoutModal').classList.add('active');
                 };
             } else {
                 btn.innerHTML = text;
             }
         };
+
+        // Custom Logout Modal Helper
+        function injectLogoutModal() {
+            if (document.getElementById('logoutModal')) return;
+            const modalHtml = `
+                <div class="modal-overlay" id="logoutModal">
+                    <div class="glass-modal modal-mini" style="text-align: center;">
+                        <div class="modal-header" style="margin-bottom: 20px;">
+                            <h2 style="color: var(--text-main); font-size: 1.4rem;">로그아웃</h2>
+                            <p>정말 로그아웃 하시겠습니까?</p>
+                        </div>
+                        <div class="modal-actions-row">
+                            <button class="btn btn-outline" id="cancelLogout">취소</button>
+                            <button class="btn auth-dynamic-btn" id="confirmLogout">확인</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            document.getElementById('cancelLogout').addEventListener('click', () => {
+                document.getElementById('logoutModal').classList.remove('active');
+            });
+
+            document.getElementById('confirmLogout').addEventListener('click', async () => {
+                const { error } = await supabase.auth.signOut();
+                if (error) alert('로그아웃 오류: ' + error.message);
+                else window.location.href = 'index.html';
+            });
+        }
 
         // All elements that should toggle Orange -> Indigo
         const dynamicElements = [

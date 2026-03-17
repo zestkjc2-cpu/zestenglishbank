@@ -855,6 +855,27 @@ ul {
     transform: translateY(0);
 }
 
+/* Confirm / Logout Modal Specifics */
+.modal-mini {
+    max-width: 360px;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.modal-actions-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-actions-row .btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
 .close-modal {
     position: absolute;
     top: 20px;
