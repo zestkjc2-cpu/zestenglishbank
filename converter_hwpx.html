@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제스트 - PDF 한글 변환기 (HWPX)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    if (session && session.access_token) {
+                        document.documentElement.classList.add('logged-in');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) window.location.href = 'index.html?login=true';
+    </script>
+    
+    <!-- PDF.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        .converter-container {
+            max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center;
+        }
+        .drop-zone {
+            height: 300px; border: 2px dashed var(--border); border-radius: 20px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--surface-light); cursor: pointer; transition: all 0.3s ease;
+            margin-bottom: 30px; position: relative; overflow: hidden;
+        }
+        .drop-zone:hover, .drop-zone.active {
+            border-color: var(--primary); background: rgba(79, 70, 229, 0.05);
+        }
+        .drop-zone-icon { font-size: 4rem; margin-bottom: 20px; }
+        .file-info { display: none; flex-direction: column; align-items: center; gap: 10px; }
+        .file-name { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+        #fileInput { display: none; }
+        .progress-container {
+            display: none; width: 100%; height: 8px; background: var(--border);
+            border-radius: 4px; margin-top: 20px; overflow: hidden;
+        }
+        .progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease; }
+        .status-text { margin-top: 10px; font-weight: 600; color: var(--text-muted); }
+        .guide-box {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 24px; text-align: left; margin-top: 40px;
+        }
+        .guide-box h4 { margin-bottom: 12px; color: var(--primary); }
+        .guide-box ul { list-style: disc; padding-left: 20px; color: var(--text-muted); font-size: 0.95rem; }
+        .guide-box li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="brand-logo">
+                <span class="zest-brand">ZEST ENGLISH BANK</span>
+            </a>
+            <nav class="main-nav">
+                <div class="header-actions">
+                    <a href="converter_select.html" class="nav-link outline-link">← 뒤로가기</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <section style="padding-top: 150px; min-height: 100vh;">
+        <div class="container">
+            <div class="converter-container">
+                <div class="section-header">
+                    <h2 class="section-title">PDF를 <span class="text-orange">한글(HWPX) 파일</span>로 변환</h2>
+                    <p class="section-desc">한글 문서 표준 포맷인 HWPX로 쉽고 빠르게 변환하세요.</p>
+                </div>
+
+                <div class="drop-zone glass-card" id="dropZone">
+                    <div class="default-content">
+                        <div class="drop-zone-icon">🇰</div>
+                        <p style="font-size: 1.1rem; font-weight: 600;">변환할 PDF 파일을 이곳으로 끌어다 놓거나 클릭하세요.</p>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">최대 20MB 이하의 PDF 파일 권장</p>
+                    </div>
+                    <div class="file-info" id="fileInfo">
+                        <div class="drop-zone-icon">📋</div>
+                        <div class="file-name" id="selectedFileName">filename.pdf</div>
+                        <button class="btn btn-outline" id="changeFileBtn" style="padding: 6px 16px; font-size: 0.85rem;">파일 변경</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="application/pdf">
+                </div>
+
+                <button class="btn btn-gradient btn-large" id="convertBtn" style="width: 100%; display: none;">한글 파일(HWPX)로 변환하기 🚀</button>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="status-text" id="statusText"></div>
+
+                <div class="guide-box">
+                    <h4>💡 한글 변환 참고사항</h4>
+                    <ul>
+                        <li>PDF의 텍스트를 추출하여 한글 표준 문서 포맷인 `.hwpx`로 변환을 시도합니다.</li>
+                        <li><strong>베타 서비스</strong>: 현재 한글 변환은 텍스트 정렬 위주로 지원되며, 표나 수식 등은 변형될 수 있습니다.</li>
+                        <li>보안을 위해 모든 처리는 고객님의 메모리에서만 이루어집니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="converter_hwpx.js" type="module"></script>
+</body>
+</html>
