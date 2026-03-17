@@ -97,15 +97,15 @@
 
         /* Apple-Style Premium Landing Styles (Manual Only) */
         .manual-premium-mode {
-            background: #000 !important;
-            color: #fff !important;
+            background: #fff !important;
+            color: #000 !important;
         }
         .manual-premium-mode .header {
-            background: rgba(0, 0, 0, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.82);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
-        .manual-premium-mode .zest-brand { color: #fff; }
-        .manual-premium-mode .nav-link.outline-link { border-color: rgba(255, 255, 255, 0.3); color: #fff; }
+        .manual-premium-mode .zest-brand { color: var(--text-main); }
+        .manual-premium-mode .nav-link.outline-link { border-color: rgba(0, 0, 0, 0.2); color: #000; }
 
         .premium-hero {
             height: 90vh;
@@ -115,7 +115,7 @@
             justify-content: center;
             text-align: center;
             padding: 0 20px;
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            background: #fff;
         }
 
         .hero-reveal {
@@ -129,19 +129,20 @@
         }
 
         .premium-title {
-            font-size: clamp(3rem, 8vw, 6rem);
+            font-size: clamp(2.1rem, 5.6vw, 4.2rem);
             font-weight: 800;
             letter-spacing: -0.03em;
             line-height: 1.1;
             margin-bottom: 20px;
-            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+            background: linear-gradient(180deg, #1d1d1f 0%, #434344 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .premium-subtitle {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: #86868b;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #515154;
             max-width: 700px;
             margin: 0 auto 40px;
             line-height: 1.4;
@@ -160,7 +161,7 @@
         }
 
         .feature-card {
-            background: #1c1c1e;
+            background: #f5f5f7;
             border-radius: 28px;
             padding: 40px;
             transition: transform 0.3s ease;
@@ -184,11 +185,11 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 15px;
-            color: #f5f5f7;
+            color: #1d1d1f;
         }
 
         .feature-card p {
-            color: #86868b;
+            color: #515154;
             font-size: 1.1rem;
             line-height: 1.6;
         }
@@ -196,12 +197,12 @@
         .premium-footer {
             padding: 100px 20px;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .cta-pill {
-            background: #fff;
-            color: #000;
+            background: #000;
+            color: #fff;
             padding: 16px 40px;
             border-radius: 980px;
             font-weight: 600;
@@ -209,7 +210,7 @@
             display: inline-block;
             transition: all 0.3s;
         }
-        .cta-pill:hover { transform: scale(1.05); background: #f5f5f7; }
+        .cta-pill:hover { transform: scale(1.05); background: #1d1d1f; }
 
         #traditionalBoard { display: block; }
         #premiumManual { display: none; }
@@ -329,8 +330,8 @@
         </div>
 
         <div class="premium-footer">
-            <h2 class="premium-title" style="font-size: 3rem; margin-bottom: 40px;">지금 바로 시작하세요.</h2>
-            <a href="index.html" class="cta-pill" style="background:#2997ff; color:#fff;">ZEST 시작하기</a>
+            <h2 class="premium-title" style="font-size: 2.1rem; margin-bottom: 40px;">지금 바로 시작하세요.</h2>
+            <a href="index.html" class="cta-pill" style="background:#000; color:#fff;">ZEST 시작하기</a>
         </div>
     </section>
 
