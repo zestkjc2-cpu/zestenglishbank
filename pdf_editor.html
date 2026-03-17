@@ -10,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     
-    <!-- PDF-Lib for local processing -->
+    <!-- PDF-Lib for local processing & PDF.js for rendering previews -->
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script>
@@ -161,6 +162,37 @@
             align-items: center;
             gap: 5px;
         }
+
+        /* Preview Styles */
+        .preview-box {
+            margin: 20px 0;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        #rotateCanvas {
+            max-width: 100%;
+            max-height: 400px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            object-fit: contain;
+        }
+
+        .thumbnail-mini {
+            width: 40px;
+            height: 56px;
+            object-fit: contain;
+            background: #eee;
+            border-radius: 4px;
+            margin-right: 12px;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
@@ -218,6 +250,11 @@
                             </div>
                             <div id="rotateInfo" class="control-panel" style="display: none;">
                                 <p><strong>선택된 파일:</strong> <span id="rotateFileName"></span></p>
+                                
+                                <div class="preview-box">
+                                    <canvas id="rotateCanvas"></canvas>
+                                </div>
+
                                 <div style="margin-top: 15px;">
                                     <label>추가로 회전할 각도:</label>
                                     <select id="rotateAngle" class="input-inline">
@@ -271,6 +308,37 @@
 
     <script>
         const { PDFDocument, degrees } = PDFLib;
+        // Set worker for pdf.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // --- Shared Rendering Utility ---
+        async function getThumbnailUrl(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({scale: 0.2}); // Low scale for thumbnails
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                await page.render({canvasContext: context, viewport}).promise;
+                return canvas.toDataURL();
+            } catch (e) { return ''; }
+        }
+
+        async function renderLargePreview(file, canvas) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({scale: 0.8});
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                const context = canvas.getContext('2d');
+                await page.render({canvasContext: context, viewport}).promise;
+            } catch (e) { console.error('Preview error:', e); }
+        }
 
         function showTool(tool) {
             document.getElementById('gridHeader').style.display = 'none';
@@ -320,12 +388,22 @@
 
         // --- Rotate Logic ---
         let selectedRotateFile = null;
-        document.getElementById('rotateFile').addEventListener('change', (e) => {
+        const rotateCanvas = document.getElementById('rotateCanvas');
+        const rotateAngleSelect = document.getElementById('rotateAngle');
+
+        document.getElementById('rotateFile').addEventListener('change', async (e) => {
             selectedRotateFile = e.target.files[0];
             if (selectedRotateFile) {
                 document.getElementById('rotateInfo').style.display = 'block';
                 document.getElementById('rotateFileName').textContent = selectedRotateFile.name;
+                rotateCanvas.style.transform = 'rotate(0deg)'; // reset
+                await renderLargePreview(selectedRotateFile, rotateCanvas);
             }
+        });
+
+        rotateAngleSelect.addEventListener('change', () => {
+            const angle = rotateAngleSelect.value;
+            rotateCanvas.style.transform = `rotate(${angle}deg)`;
         });
 
         document.getElementById('runRotateBtn').addEventListener('click', async () => {
@@ -353,8 +431,12 @@
         const mergeListEl = document.getElementById('mergeFileList');
         const runMergeBtn = document.getElementById('runMergeBtn');
 
-        mergeInput.addEventListener('change', (e) => {
-            mergeFiles = [...mergeFiles, ...Array.from(e.target.files)];
+        mergeInput.addEventListener('change', async (e) => {
+            const newFiles = Array.from(e.target.files);
+            for (const f of newFiles) {
+                const thumb = await getThumbnailUrl(f);
+                mergeFiles.push({ file: f, thumbnail: thumb });
+            }
             updateMergeList();
         });
 
@@ -366,9 +448,12 @@
             }
             mergeListEl.style.display = 'block';
             runMergeBtn.style.display = 'block';
-            mergeListEl.innerHTML = mergeFiles.map((f, i) => `
+            mergeListEl.innerHTML = mergeFiles.map((item, i) => `
                 <div class="file-item">
-                    <span>${i+1}. ${f.name}</span>
+                    <div style="display: flex; align-items: center;">
+                        <img src="${item.thumbnail}" class="thumbnail-mini">
+                        <span>${i+1}. ${item.file.name}</span>
+                    </div>
                     <span class="delete-btn" onclick="removeMergeFile(${i})">삭제</span>
                 </div>
             `).join('');
@@ -384,8 +469,8 @@
             try {
                 runMergeBtn.disabled = true; runMergeBtn.textContent = '합치는 중...';
                 const mergedPdf = await PDFDocument.create();
-                for (const file of mergeFiles) {
-                    const bytes = await file.arrayBuffer();
+                for (const item of mergeFiles) {
+                    const bytes = await item.file.arrayBuffer();
                     const pdf = await PDFDocument.load(bytes);
                     const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
                     pages.forEach(p => mergedPdf.addPage(p));
