@@ -88,10 +88,14 @@ convertBtn.addEventListener('click', async () => {
     try {
         const arrayBuffer = await currentFile.arrayBuffer();
         
-        // Ensure pdfjsLib is available
+        // Ensure libraries are available
         if (typeof pdfjsLib === 'undefined') {
             throw new Error('PDF 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
         }
+
+        const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
+        if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
+        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
 
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const totalPages = pdf.numPages;
@@ -110,7 +114,6 @@ convertBtn.addEventListener('click', async () => {
             const lines = [];
             textContent.items.forEach(item => {
                 // transform[5] is the Y-coordinate (bottom-up in PDF)
-                // transform[0] or transform[3] usually contains font scale/size
                 const y = Math.round(item.transform[5]);
                 const fontSize = Math.abs(item.transform[0]); 
                 
@@ -150,10 +153,6 @@ convertBtn.addEventListener('click', async () => {
 
         statusText.textContent = '워드 파일 생성 중...';
         progressBar.style.width = `80%`;
-
-        const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
-        if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
-        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
 
         const doc = new Document({
             sections: docSections
