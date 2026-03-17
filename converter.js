@@ -125,7 +125,8 @@ function reconstructParagraphs(text) {
 /**
  * Process a list of items into grouped lines of text (paragraphs)
  */
-function processItemsToParagraphs(items, { Paragraph, TextRun }) {
+function processItemsToParagraphs(items, docxComponents) {
+    const { Paragraph, TextRun } = docxComponents;
     const lines = [];
     items.forEach(item => {
         const y = Math.round(item.transform[5]);
