@@ -42,7 +42,9 @@
             max-width: 800px; margin: 0 auto; padding: 40px 20px; text-align: center;
         }
         .drop-zone {
-            height: 160px;
+            height: 300px;
+            max-width: 400px;
+            margin: 0 auto 30px;
             border: 2px dashed var(--border); border-radius: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: var(--surface-light); cursor: pointer; transition: all 0.3s ease;
@@ -51,7 +53,7 @@
         .drop-zone:hover, .drop-zone.active {
             border-color: var(--primary); background: rgba(79, 70, 229, 0.05);
         }
-        .drop-zone-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .drop-zone-icon { font-size: 4rem; margin-bottom: 20px; }
         .file-info { display: none; flex-direction: column; align-items: center; gap: 10px; }
         .file-name { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
         #fileInput { display: none; }
