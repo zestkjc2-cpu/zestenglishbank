@@ -219,18 +219,25 @@
                     <button class="btn btn-gradient btn-large" id="generateBtn" style="width: 100%;">변형문제 생성하기 🚀</button>
                 </div>
 
-                <div class="result-section" id="resultSection">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                        <h3 id="resultTitle">생성된 변형문제</h3>
-                        <button class="btn btn-outline" id="exportBtn">Word 파일로 저장 📥</button>
-                    </div>
-                    <div id="questionsContainer">
-                        <!-- Questions will be injected here -->
-                    </div>
-                </div>
+    <!-- Preview Modal -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="glass-modal modal-wide" style="padding: 30px; max-height: 90vh; overflow-y: auto; text-align: left;">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header" style="text-align: left; margin-bottom: 25px;">
+                <h2 style="color: var(--text-main); font-size: 1.6rem;">생성된 문제 미리보기</h2>
+                <p>생성된 문항을 확인하고 필요시 수정하거나 확정하세요.</p>
+            </div>
+            
+            <div id="previewContainer" style="margin-bottom: 30px;">
+                <!-- Preview items injected here -->
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-outline close-modal" style="padding: 10px 25px;">취소</button>
+                <button class="btn btn-gradient" id="confirmAddBtn" style="padding: 10px 30px;">확정 및 목록 추가 📥</button>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Question Type Description Modal -->
     <div class="modal-overlay" id="typeDescModal">
