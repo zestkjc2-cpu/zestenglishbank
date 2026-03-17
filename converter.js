@@ -120,7 +120,11 @@ convertBtn.addEventListener('click', async () => {
         progressBar.style.width = `80%`;
 
         // Create DOCX structure
-        const { Document, Packer, Paragraph, TextRun } = window.docx || docx;
+        const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
+        if (!docxLib) {
+            throw new Error('Word 변환 라이브러리(docx)를 불러오지 못했습니다. 페이지를 새로고침 해주세요.');
+        }
+        const { Document, Packer, Paragraph, TextRun } = docxLib;
 
         const doc = new Document({
             sections: [{
