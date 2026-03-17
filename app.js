@@ -125,8 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
             dynamicElements.forEach(el => el && el.classList.add('logged-in'));
 
             // Inject Global Back Button (Left of Login/Logout)
+            const isHomePage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '';
             const headerActions = document.querySelector('.header-actions');
-            if (headerActions && loginBtn && !document.getElementById('globalBackBtn')) {
+            if (headerActions && loginBtn && !document.getElementById('globalBackBtn') && !isHomePage) {
                 const backBtn = document.createElement('a');
                 backBtn.id = 'globalBackBtn';
                 backBtn.href = 'javascript:history.back()';
