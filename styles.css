@@ -195,6 +195,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-left: 100px; /* Symmetry with header-actions right margin */
 }
 
 /* Main Title Dynamic Gradient */
@@ -311,6 +312,10 @@ ul {
     }
     .header-actions {
         gap: 4px;
+        margin-right: 0;
+    }
+    .brand-logo {
+        margin-left: 0;
     }
     .header-actions .nav-link {
         font-size: 0.7rem;
