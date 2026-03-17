@@ -68,12 +68,27 @@ convertBtn.addEventListener('click', async () => {
 
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            fullText += textContent.items.map(item => item.str).join(' ') + "\n\n";
+            
+            // Group by lines
+            const lines = [];
+            textContent.items.forEach(item => {
+                const y = Math.round(item.transform[5]);
+                let line = lines.find(l => Math.abs(l.y - y) < 5);
+                if (!line) {
+                    line = { y: y, items: [] };
+                    lines.push(line);
+                }
+                line.items.push({ text: item.str, x: item.transform[4] });
+            });
+
+            lines.sort((a, b) => b.y - a.y);
+            lines.forEach(line => {
+                line.items.sort((a, b) => a.x - b.x);
+                fullText += line.items.map(it => it.text).join(' ') + "\n";
+            });
+            fullText += "\n"; // Page break simulation
         }
 
-        // HWPX is complex XML-zipped. For a direct browser "HWPX" output without a heavy library, 
-        // we will output a Text file with .hwpx extension as a "Text HWPX" stub or advise.
-        // Realistically, users want the extension.
         const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, currentFile.name.replace('.pdf', '') + "_extracted.hwpx");
 

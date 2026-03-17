@@ -95,7 +95,8 @@ convertBtn.addEventListener('click', async () => {
 
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const totalPages = pdf.numPages;
-        let fullText = "";
+        
+        const docSections = [];
 
         for (let i = 1; i <= totalPages; i++) {
             statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
@@ -105,47 +106,61 @@ convertBtn.addEventListener('click', async () => {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
             
-            // Collect text items
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            if (pageText.trim()) {
-                fullText += pageText + "\n\n";
-            }
-        }
+            // Group text items by Y coordinate (lines)
+            const lines = [];
+            textContent.items.forEach(item => {
+                // transform[5] is the Y-coordinate (bottom-up in PDF)
+                // transform[0] or transform[3] usually contains font scale/size
+                const y = Math.round(item.transform[5]);
+                const fontSize = Math.abs(item.transform[0]); 
+                
+                let line = lines.find(l => Math.abs(l.y - y) < 5); // 5 unit threshold for same line
+                if (!line) {
+                    line = { y: y, items: [] };
+                    lines.push(line);
+                }
+                line.items.push({
+                    text: item.str,
+                    x: item.transform[4],
+                    fontSize: fontSize
+                });
+            });
 
-        if (!fullText.trim()) {
-            throw new Error('PDF에서 텍스트를 추출할 수 없습니다. 스캔된 이미지가 아닌 텍스트 기반 PDF를 사용해주세요.');
+            // Sort lines from top to bottom (Y is bottom-up)
+            lines.sort((a, b) => b.y - a.y);
+
+            const pageParagraphs = lines.map(line => {
+                // Sort items in line by X coordinate
+                line.items.sort((a, b) => a.x - b.x);
+                
+                return new Paragraph({
+                    children: line.items.map(it => new TextRun({
+                        text: it.text + " ",
+                        size: Math.round(it.fontSize * 2), // DOCX size is in half-points
+                        font: "Pretendard"
+                    })),
+                    spacing: { before: 100, after: 100 }
+                });
+            });
+
+            docSections.push({
+                children: pageParagraphs
+            });
         }
 
         statusText.textContent = '워드 파일 생성 중...';
         progressBar.style.width = `80%`;
 
-        // Create DOCX structure
         const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
-        
-        if (!docxLib) {
-            console.error("Library detect failed. window.docx:", window.docx);
-            throw new Error('Word 변환 라이브러리(docx)를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
-        }
-
-        // Handle cases where libraries are under .default (common in some CDN/UMD builds)
+        if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
         const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
-        
-        if (!Document || !Packer) {
-            throw new Error('Word 라이브러리 형식이 올바르지 않습니다. (Missing Document/Packer)');
-        }
 
         const doc = new Document({
-            sections: [{
-                children: fullText.split('\n').filter(line => line.trim()).map(line => {
-                    return new Paragraph({
-                        children: [new TextRun({ text: line, font: "Pretendard" })],
-                    });
-                }),
-            }],
+            sections: docSections
         });
 
         const blob = await Packer.toBlob(doc);
-        saveAs(blob, currentFile.name.replace('.pdf', '') + "_converted.docx");
+        saveAs(blob, currentFile.name.replace('.pdf', '') + "_layout_preserved.docx");
 
         progressBar.style.width = `100%`;
         statusText.textContent = '변환 완료!';
