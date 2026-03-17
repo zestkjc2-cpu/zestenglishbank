@@ -15,6 +15,13 @@ const statusText = document.getElementById('statusText');
 let currentFile = null;
 let abortController = null;
 
+const NARROW_MARGINS = {
+    top: 720,
+    right: 720,
+    bottom: 720,
+    left: 720,
+};
+
 // UI Sync with Auth State
 async function syncUI() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -245,7 +252,10 @@ convertBtn.addEventListener('click', async () => {
                         }));
                     });
                 }
-                docSections.push({ children: pageParas });
+                docSections.push({ 
+                    properties: { page: { margin: NARROW_MARGINS } },
+                    children: pageParas 
+                });
             }
             await worker.terminate();
         } else if (convMode === 'column') {
@@ -270,7 +280,10 @@ convertBtn.addEventListener('click', async () => {
                     ...processItemsToParagraphs(leftItems, { Document, Packer, Paragraph, TextRun }),
                     ...processItemsToParagraphs(rightItems, { Document, Packer, Paragraph, TextRun })
                 ];
-                docSections.push({ children: paras });
+                docSections.push({ 
+                    properties: { page: { margin: NARROW_MARGINS } },
+                    children: paras 
+                });
             }
         } else {
             for (let i = 1; i <= totalPages; i++) {
@@ -278,7 +291,10 @@ convertBtn.addEventListener('click', async () => {
                 statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
                 const page = await pdf.getPage(i);
-                docSections.push({ children: processItemsToParagraphs((await page.getTextContent()).items, { Document, Packer, Paragraph, TextRun }) });
+                docSections.push({ 
+                    properties: { page: { margin: NARROW_MARGINS } },
+                    children: processItemsToParagraphs((await page.getTextContent()).items, { Document, Packer, Paragraph, TextRun }) 
+                });
             }
         }
 
