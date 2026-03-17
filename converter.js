@@ -173,6 +173,77 @@ function processItemsToParagraphs(items, docxComponents) {
     return paragraphs;
 }
 
+/**
+ * Smart extraction for exam questions:
+ * 1. Filters out headers/footers (top 10% / bottom 10%)
+ * 2. Groups items into "Question Blocks" starting with "1.", "2.", "3.", etc.
+ */
+async function extractQuestionBlocks(page, docxComponents) {
+    const { Paragraph, TextRun } = docxComponents;
+    const viewport = page.getViewport({ scale: 1.0 });
+    const content = await page.getTextContent();
+    const items = content.items;
+    
+    // Noise filtering (Y-axis)
+    const topLimit = viewport.height * 0.90; // pdf.js Y=0 is bottom
+    const bottomLimit = viewport.height * 0.10;
+    
+    const filtered = items.filter(it => {
+        const y = it.transform[5];
+        return y < topLimit && y > bottomLimit;
+    });
+
+    // Grouping by Y-lines first
+    const lines = [];
+    filtered.forEach(it => {
+        const y = Math.round(it.transform[5]);
+        let line = lines.find(l => Math.abs(l.y - y) < 4);
+        if (!line) {
+            line = { y: y, items: [] };
+            lines.push(line);
+        }
+        line.items.push({ text: it.str, x: it.transform[4], w: it.width });
+    });
+    lines.sort((a, b) => b.y - a.y);
+
+    const blocks = [];
+    let currentBlock = [];
+
+    // Simple heuristic for question start: "Number." at beginning of line
+    const questionStartRegex = /^[0-9]{1,2}[\.\)]/;
+
+    lines.forEach(line => {
+        line.items.sort((a, b) => a.x - b.x);
+        const lineText = line.items.map(it => it.text).join(" ").trim();
+        
+        if (questionStartRegex.test(lineText)) {
+            if (currentBlock.length > 0) blocks.push(currentBlock);
+            currentBlock = [lineText];
+        } else {
+            if (currentBlock.length > 0) currentBlock.push(lineText);
+        }
+    });
+    if (currentBlock.length > 0) blocks.push(currentBlock);
+
+    // Convert blocks to Paragraphs
+    const paras = [];
+    blocks.forEach(block => {
+        block.forEach((line, idx) => {
+            paras.push(new Paragraph({
+                children: [new TextRun({ 
+                    text: line, 
+                    font: "Pretendard", 
+                    size: 24,
+                    bold: idx === 0 // Bold the first line (question line)
+                })],
+                spacing: { before: idx === 0 ? 400 : 80, after: 80 }
+            }));
+        });
+    });
+    
+    return paras;
+}
+
 convertBtn.addEventListener('click', async () => {
     if (!currentFile) return;
 
@@ -289,6 +360,18 @@ convertBtn.addEventListener('click', async () => {
                     children: paras 
                 });
             }
+        } else if (convMode === 'smart') {
+            for (let i = 1; i <= totalPages; i++) {
+                if (abortController.signal.aborted) throw new Error('CANCELED');
+                statusText.textContent = `스마트 문제 추출 중 (${i} / ${totalPages})...`;
+                progressBar.style.width = `${(i / totalPages) * 90}%`;
+                const page = await pdf.getPage(i);
+                const paras = await extractQuestionBlocks(page, { Paragraph, TextRun });
+                docSections.push({ 
+                    properties: { page: { margin: NARROW_MARGINS } },
+                    children: paras 
+                });
+            }
         } else {
             for (let i = 1; i <= totalPages; i++) {
                 if (abortController.signal.aborted) throw new Error('CANCELED');
@@ -306,7 +389,7 @@ convertBtn.addEventListener('click', async () => {
 
         const doc = new Document({ sections: docSections });
         const blob = await Packer.toBlob(doc);
-        const suffixMap = { layout: "_Layout.docx", column: "_2Column.docx", ocr: "_OCR.docx" };
+        const suffixMap = { layout: "_Layout.docx", column: "_2Column.docx", ocr: "_OCR.docx", smart: "_SmartExam.docx" };
         saveAs(blob, currentFile.name.replace('.pdf', '') + (suffixMap[convMode] || ".docx"));
 
         progressBar.style.width = '100%';
