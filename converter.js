@@ -204,7 +204,7 @@ convertBtn.addEventListener('click', async () => {
         if (typeof pdfjsLib === 'undefined') throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
         const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
         if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
-        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
+        const { Document, Packer, Paragraph, TextRun, ColumnBreak } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
 
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, signal: abortController.signal }).promise;
         const totalPages = pdf.numPages;
@@ -278,10 +278,14 @@ convertBtn.addEventListener('click', async () => {
 
                 const paras = [
                     ...processItemsToParagraphs(leftItems, { Document, Packer, Paragraph, TextRun }),
+                    new Paragraph({ children: [new ColumnBreak()] }),
                     ...processItemsToParagraphs(rightItems, { Document, Packer, Paragraph, TextRun })
                 ];
                 docSections.push({ 
-                    properties: { page: { margin: NARROW_MARGINS } },
+                    properties: { 
+                        page: { margin: NARROW_MARGINS },
+                        columns: { count: 2, space: 720, separate: true }
+                    },
                     children: paras 
                 });
             }
