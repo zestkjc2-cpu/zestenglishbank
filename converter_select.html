@@ -98,7 +98,34 @@
             background: var(--surface);
         }
         @media (max-width: 640px) {
-            .mode-grid { grid-template-columns: 1fr; }
+            .select-container { padding: 20px 10px; }
+            .mode-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 12px;
+                margin-top: 20px;
+            }
+            .mode-card {
+                padding: 24px 12px;
+                border-radius: 16px;
+                gap: 12px;
+            }
+            .mode-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+                border-radius: 16px;
+            }
+            .mode-title {
+                font-size: 0.95rem;
+                word-break: keep-all;
+            }
+            .mode-desc {
+                display: none; /* Hide description on mobile to save space */
+            }
+            .mode-card .btn-outline {
+                padding: 6px 12px !important;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
