@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const entryFreeBtn = document.getElementById('entryFreeBtn');
     const converterBtn = document.getElementById('converterBtn');
     const questionGenBtn = document.getElementById('questionGenBtn');
+    const pdfEditBtn = document.getElementById('pdfEditBtn');
 
     async function handleGatedLink(e, url) {
         e.preventDefault();
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(entryFreeBtn) entryFreeBtn.addEventListener('click', (e) => handleGatedLink(e, 'trial.html'));
     if(converterBtn) converterBtn.addEventListener('click', (e) => handleGatedLink(e, 'converter_select.html'));
     if(questionGenBtn) questionGenBtn.addEventListener('click', (e) => handleGatedLink(e, 'question_gen.html'));
+    if(pdfEditBtn) pdfEditBtn.addEventListener('click', (e) => handleGatedLink(e, 'pdf_editor.html'));
 
     closeModals.forEach(btn => {
         btn.addEventListener('click', () => {
