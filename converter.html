@@ -220,7 +220,20 @@
                     <input type="file" id="fileInput" accept="application/pdf">
                 </div>
 
-                <button class="btn btn-gradient btn-large" id="convertBtn" style="width: 100%; display: none;">워드 파일로 변환하기 🚀</button>
+                <div class="mode-selection" id="modeSelection" style="display: none; margin-top: 20px;">
+                    <label class="mode-option active" id="layoutModeLabel">
+                        <input type="radio" name="convMode" value="layout" checked>
+                        <span class="mode-title">디자인 보존 모드 (Beta)</span>
+                        <span class="mode-desc">레이아웃과 서식을 최대한 유지합니다.</span>
+                    </label>
+                    <label class="mode-option" id="ocrModeLabel">
+                        <input type="radio" name="convMode" value="ocr">
+                        <span class="mode-title">텍스트 정밀 추출 (OCR)</span>
+                        <span class="mode-desc">시험지 텍스트만 정교하게 추출합니다.</span>
+                    </label>
+                </div>
+
+                <button class="btn btn-gradient btn-large" id="convertBtn" style="width: 100%; display: none; margin-top: 20px;">워드 파일로 변환하기 🚀</button>
 
                 <div class="progress-container" id="progressContainer">
                     <div class="progress-bar" id="progressBar"></div>
