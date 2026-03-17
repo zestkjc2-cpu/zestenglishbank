@@ -121,10 +121,18 @@ convertBtn.addEventListener('click', async () => {
 
         // Create DOCX structure
         const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
+        
         if (!docxLib) {
-            throw new Error('Word 변환 라이브러리(docx)를 불러오지 못했습니다. 페이지를 새로고침 해주세요.');
+            console.error("Library detect failed. window.docx:", window.docx);
+            throw new Error('Word 변환 라이브러리(docx)를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
         }
-        const { Document, Packer, Paragraph, TextRun } = docxLib;
+
+        // Handle cases where libraries are under .default (common in some CDN/UMD builds)
+        const { Document, Packer, Paragraph, TextRun } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
+        
+        if (!Document || !Packer) {
+            throw new Error('Word 라이브러리 형식이 올바르지 않습니다. (Missing Document/Packer)');
+        }
 
         const doc = new Document({
             sections: [{

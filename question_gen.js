@@ -176,11 +176,19 @@ function renderQuestion(q, title) {
 // Export to DOCX
 exportBtn.addEventListener('click', async () => {
     const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
+    
     if (!docxLib) {
         alert('Word 라이브러리를 불러오지 못했습니다. 페이지를 새로고침 해주세요.');
         return;
     }
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docxLib;
+
+    // Handle .default property
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
+    
+    if (!Document || !Packer) {
+        alert('Word 라이브러리 초기화 실패. 페이지를 새로고침 해주세요.');
+        return;
+    }
 
     const sections = generatedData.map(q => {
         const children = [
