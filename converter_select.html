@@ -92,6 +92,11 @@
             font-size: 0.95rem;
             line-height: 1.6;
         }
+        .mode-card:hover .btn-outline {
+            color: var(--primary) !important;
+            border-color: var(--primary) !important;
+            background: var(--surface);
+        }
         @media (max-width: 640px) {
             .mode-grid { grid-template-columns: 1fr; }
         }
@@ -124,7 +129,7 @@
                         <div class="mode-icon">Ⓜ️</div>
                         <div class="mode-title">워드 파일 (docx) 변환</div>
                         <p class="mode-desc">MS Word에서 편집 가능한<br>문서 형식으로 변환합니다.</p>
-                        <span class="btn btn-gradient" style="padding: 10px 24px;">선택하기</span>
+                        <span class="btn btn-outline" style="padding: 10px 24px;">선택하기</span>
                     </a>
 
                     <a href="converter_hwpx.html" class="mode-card glass-card">
