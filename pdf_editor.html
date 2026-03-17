@@ -607,7 +607,9 @@
                     pages.forEach(p => mergedPdf.addPage(p));
                 }
                 const mergedBytes = await mergedPdf.save();
-                saveAs(new Blob([mergedBytes]), 'merged_document.pdf');
+                // Use the first file's name as the base
+                const firstFileName = mergeFiles[0].file.name.replace(/\.[^/.]+$/, "");
+                saveAs(new Blob([mergedBytes]), `${firstFileName}_합치기.pdf`);
             } catch (err) { alert('오류: ' + err.message); }
             finally { runMergeBtn.disabled = false; runMergeBtn.textContent = '합치기 시작 🚀'; }
         });
