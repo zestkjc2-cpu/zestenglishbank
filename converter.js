@@ -113,36 +113,68 @@ convertBtn.addEventListener('click', async () => {
             // Group text items by Y coordinate (lines)
             const lines = [];
             textContent.items.forEach(item => {
-                // transform[5] is the Y-coordinate (bottom-up in PDF)
                 const y = Math.round(item.transform[5]);
                 const fontSize = Math.abs(item.transform[0]); 
+                const x = item.transform[4];
                 
-                let line = lines.find(l => Math.abs(l.y - y) < 5); // 5 unit threshold for same line
+                let line = lines.find(l => Math.abs(l.y - y) < 4); // tighter threshold
                 if (!line) {
                     line = { y: y, items: [] };
                     lines.push(line);
                 }
                 line.items.push({
                     text: item.str,
-                    x: item.transform[4],
+                    x: x,
+                    width: item.width,
                     fontSize: fontSize
                 });
             });
 
-            // Sort lines from top to bottom (Y is bottom-up)
             lines.sort((a, b) => b.y - a.y);
 
             const pageParagraphs = lines.map(line => {
-                // Sort items in line by X coordinate
                 line.items.sort((a, b) => a.x - b.x);
                 
-                return new Paragraph({
-                    children: line.items.map(it => new TextRun({
-                        text: it.text + " ",
-                        size: Math.round(it.fontSize * 2), // DOCX size is in half-points
+                const children = [];
+                let currentMergedText = "";
+                let lastX = -1;
+                let lastFontSize = 10;
+
+                line.items.forEach((it, idx) => {
+                    // Logic to detect if we should add a space or if it's a column break
+                    // x + width of previous item vs x of current item
+                    const gap = lastX !== -1 ? (it.x - lastX) : 0;
+                    
+                    if (gap > 60) { // Large gap = potential column break
+                        if (currentMergedText) {
+                            children.push(new TextRun({
+                                text: currentMergedText.trim() + "   ", // Visual gap helper
+                                size: Math.round(lastFontSize * 2),
+                                font: "Pretendard"
+                            }));
+                        }
+                        currentMergedText = it.text;
+                    } else if (gap > 2) { // Small gap = regular space
+                        currentMergedText += " " + it.text;
+                    } else { // Tiny gap = merge without space (ligatures/kerns)
+                        currentMergedText += it.text;
+                    }
+
+                    lastX = it.x + it.width;
+                    lastFontSize = it.fontSize;
+                });
+
+                if (currentMergedText) {
+                    children.push(new TextRun({
+                        text: currentMergedText.trim(),
+                        size: Math.round(lastFontSize * 2),
                         font: "Pretendard"
-                    })),
-                    spacing: { before: 100, after: 100 }
+                    }));
+                }
+                
+                return new Paragraph({
+                    children: children,
+                    spacing: { before: 80, after: 80 }
                 });
             });
 

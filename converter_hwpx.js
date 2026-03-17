@@ -73,18 +73,35 @@ convertBtn.addEventListener('click', async () => {
             const lines = [];
             textContent.items.forEach(item => {
                 const y = Math.round(item.transform[5]);
-                let line = lines.find(l => Math.abs(l.y - y) < 5);
+                let line = lines.find(l => Math.abs(l.y - y) < 4);
                 if (!line) {
                     line = { y: y, items: [] };
                     lines.push(line);
                 }
-                line.items.push({ text: item.str, x: item.transform[4] });
+                line.items.push({ 
+                    text: item.str, 
+                    x: item.transform[4],
+                    width: item.width 
+                });
             });
 
             lines.sort((a, b) => b.y - a.y);
             lines.forEach(line => {
                 line.items.sort((a, b) => a.x - b.x);
-                fullText += line.items.map(it => it.text).join(' ') + "\n";
+                let lineText = "";
+                let lastX = -1;
+                line.items.forEach(it => {
+                    const gap = lastX !== -1 ? (it.x - lastX) : 0;
+                    if (gap > 60) {
+                        lineText += "   " + it.text;
+                    } else if (gap > 2) {
+                        lineText += " " + it.text;
+                    } else {
+                        lineText += it.text;
+                    }
+                    lastX = it.x + it.width;
+                });
+                fullText += lineText.trim() + "\n";
             });
             fullText += "\n"; // Page break simulation
         }
