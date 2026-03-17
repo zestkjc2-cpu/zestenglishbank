@@ -16,10 +16,10 @@ let currentFile = null;
 let abortController = null;
 
 const NARROW_MARGINS = {
-    top: 720,
-    right: 720,
-    bottom: 720,
-    left: 720,
+    top: 567,
+    right: 567,
+    bottom: 567,
+    left: 567,
 };
 
 // UI Sync with Auth State
