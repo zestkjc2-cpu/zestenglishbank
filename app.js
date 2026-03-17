@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(entryFreeBtn) entryFreeBtn.addEventListener('click', (e) => handleGatedLink(e, 'trial.html'));
-    if(converterBtn) converterBtn.addEventListener('click', (e) => handleGatedLink(e, 'converter.html'));
+    if(converterBtn) converterBtn.addEventListener('click', (e) => handleGatedLink(e, 'converter_select.html'));
     if(questionGenBtn) questionGenBtn.addEventListener('click', (e) => handleGatedLink(e, 'question_gen.html'));
 
     closeModals.forEach(btn => {
