@@ -193,6 +193,52 @@
             margin-right: 12px;
             border: 1px solid var(--border);
         }
+
+        /* Rotation Button Styles */
+        .rotation-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .rotate-btn-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .rotate-btn-circle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .rotate-btn-circle.active {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(79, 70, 229, 0.2);
+        }
+
+        .rotate-icon-small {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        .rotate-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -255,13 +301,27 @@
                                     <canvas id="rotateCanvas"></canvas>
                                 </div>
 
-                                <div style="margin-top: 15px;">
-                                    <label>추가로 회전할 각도:</label>
-                                    <select id="rotateAngle" class="input-inline">
-                                        <option value="90">시계방향 90° 회전</option>
-                                        <option value="180">180° 반전 회전</option>
-                                        <option value="270">시계방향 270° 회전</option>
-                                    </select>
+                                <div style="margin-top: 25px; text-align: center;">
+                                    <p style="font-weight: 600; margin-bottom: 10px;">시계방향 회전하기</p>
+                                    <div class="rotation-controls">
+                                        <div class="rotate-btn-circle" data-angle="90">
+                                            <span class="rotate-icon-small">↻</span>
+                                            <span class="rotate-label">90°</span>
+                                        </div>
+                                        <div class="rotate-btn-circle" data-angle="180">
+                                            <span class="rotate-icon-small">↻</span>
+                                            <span class="rotate-label">180°</span>
+                                        </div>
+                                        <div class="rotate-btn-circle" data-angle="270">
+                                            <span class="rotate-icon-small">↻</span>
+                                            <span class="rotate-label">270°</span>
+                                        </div>
+                                        <div class="rotate-btn-circle" data-angle="360">
+                                            <span class="rotate-icon-small">↺</span>
+                                            <span class="rotate-label">360°</span>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="rotateAngle" value="0">
                                 </div>
                                 <button id="runRotateBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px;">회전 후 저장하기 💾</button>
                             </div>
@@ -389,35 +449,48 @@
         // --- Rotate Logic ---
         let selectedRotateFile = null;
         const rotateCanvas = document.getElementById('rotateCanvas');
-        const rotateAngleSelect = document.getElementById('rotateAngle');
+        const rotateAngleInput = document.getElementById('rotateAngle');
+        const rotateBtns = document.querySelectorAll('.rotate-btn-circle');
+        let currentVisualAngle = 0;
 
         document.getElementById('rotateFile').addEventListener('change', async (e) => {
             selectedRotateFile = e.target.files[0];
             if (selectedRotateFile) {
                 document.getElementById('rotateInfo').style.display = 'block';
                 document.getElementById('rotateFileName').textContent = selectedRotateFile.name;
-                rotateCanvas.style.transform = 'rotate(0deg)'; // reset
+                currentVisualAngle = 0;
+                rotateAngleInput.value = "0";
+                rotateCanvas.style.transform = 'rotate(0deg)';
+                rotateBtns.forEach(b => b.classList.remove('active'));
                 await renderLargePreview(selectedRotateFile, rotateCanvas);
             }
         });
 
-        rotateAngleSelect.addEventListener('change', () => {
-            const angle = rotateAngleSelect.value;
-            rotateCanvas.style.transform = `rotate(${angle}deg)`;
+        rotateBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const angle = parseInt(btn.getAttribute('data-angle'));
+                rotateBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                rotateAngleInput.value = angle;
+                rotateCanvas.style.transform = `rotate(${angle}deg)`;
+            });
         });
 
         document.getElementById('runRotateBtn').addEventListener('click', async () => {
             if (!selectedRotateFile) return;
+            const angle = parseInt(rotateAngleInput.value);
+            if (angle === 0 && !confirm('0도(회전 없음) 상태입니다. 그대로 저장하시겠습니까?')) return;
+            
             const btn = document.getElementById('runRotateBtn');
             try {
                 btn.disabled = true; btn.textContent = '처리 중...';
                 const bytes = await selectedRotateFile.arrayBuffer();
                 const pdf = await PDFDocument.load(bytes);
-                const angle = parseInt(document.getElementById('rotateAngle').value);
                 const pages = pdf.getPages();
                 pages.forEach(p => {
-                    const currentRotation = p.getRotation().angle;
-                    p.setRotation(degrees((currentRotation + angle) % 360));
+                    const existingRotation = p.getRotation().angle;
+                    p.setRotation(degrees((existingRotation + angle) % 360));
                 });
                 const savedBytes = await pdf.save();
                 saveAs(new Blob([savedBytes]), selectedRotateFile.name.replace('.pdf', '_rotated.pdf'));
