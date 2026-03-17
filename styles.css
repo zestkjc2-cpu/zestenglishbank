@@ -272,16 +272,19 @@ ul {
 }
 
 @media (max-width: 480px) {
+    .zest-brand {
+        font-size: 1.1rem;
+    }
     .header-actions {
-        gap: 8px;
+        gap: 4px;
     }
     .header-actions .nav-link {
-        font-size: 0.85rem;
-        padding: 6px 10px;
+        font-size: 0.7rem;
+        padding: 5px 8px !important;
     }
     .brand-logo svg {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
     }
 }
 
