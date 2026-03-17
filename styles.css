@@ -285,6 +285,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-right: 100px; /* Shift buttons inward by ~one button width */
 }
 
 @media (max-width: 480px) {
