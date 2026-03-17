@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (session) {
             // Change Nav Login to Logout
+            loginBtn.className = 'nav-link primary-btn';
             updateBtn(loginBtn, 'Logout', true);
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);

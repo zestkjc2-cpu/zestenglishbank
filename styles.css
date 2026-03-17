@@ -229,7 +229,7 @@ ul {
 
 .logged-in .zest-brand,
 .zest-brand.logged-in {
-    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    background: #4F46E5;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -250,19 +250,36 @@ ul {
 }
 
 .nav-link.outline-link {
-    border: 1px solid var(--border);
+    border: 1px solid #E5E7EB;
     border-radius: 8px;
-    padding: 8px 16px;
-    color: var(--text-main);
-    font-size: 0.9rem;
+    padding: 10px 20px;
+    color: #1F2937;
+    font-size: 0.95rem;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    background: white;
 }
 
 .nav-link.outline-link:hover {
-    border-color: var(--primary-light);
-    background: rgba(79, 70, 229, 0.05);
-    color: var(--primary);
+    border-color: #D1D5DB;
+    background: #F9FAFB;
+}
+
+.nav-link.primary-btn {
+    background: #4F46E5;
+    color: white !important;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.nav-link.primary-btn:hover {
+    background: #4338CA;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .nav-list {
