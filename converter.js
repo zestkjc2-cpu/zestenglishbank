@@ -346,37 +346,7 @@ convertBtn.addEventListener('click', async () => {
                 });
             }
             await worker.terminate();
-        } else if (convMode === 'column') {
-            for (let i = 1; i <= totalPages; i++) {
-                if (abortController.signal.aborted) throw new Error('CANCELED');
-                statusText.textContent = `2단 분리 분석 중 (${i} / ${totalPages})...`;
-                progressBar.style.width = `${(i / totalPages) * 90}%`;
 
-                const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 1.0 });
-                const midX = viewport.width / 2;
-                const textContent = await page.getTextContent();
-                
-                const leftItems = [];
-                const rightItems = [];
-                textContent.items.forEach(item => {
-                    if (item.transform[4] < midX) leftItems.push(item);
-                    else rightItems.push(item);
-                });
-
-                const paras = [
-                    ...processItemsToParagraphs(leftItems, { Document, Packer, Paragraph, TextRun }),
-                    new Paragraph({ children: [new ColumnBreak()] }),
-                    ...processItemsToParagraphs(rightItems, { Document, Packer, Paragraph, TextRun })
-                ];
-                docSections.push({ 
-                    properties: { 
-                        page: { margin: NARROW_MARGINS },
-                        columns: { count: 2, space: 720, separate: true }
-                    },
-                    children: paras 
-                });
-            }
         } else if (convMode === 'smart') {
             let totalQuestions = 0;
             for (let i = 1; i <= totalPages; i++) {
@@ -396,24 +366,13 @@ convertBtn.addEventListener('click', async () => {
             if (docSections.length === 0) {
                 throw new Error('텍스트를 찾을 수 없습니다. 이미지가 포함된 PDF라면 [OCR] 모드를 사용해 보세요.');
             }
-        } else {
-            for (let i = 1; i <= totalPages; i++) {
-                if (abortController.signal.aborted) throw new Error('CANCELED');
-                statusText.textContent = `페이지 분석 중 (${i} / ${totalPages})...`;
-                progressBar.style.width = `${(i / totalPages) * 90}%`;
-                const page = await pdf.getPage(i);
-                docSections.push({ 
-                    properties: { page: { margin: NARROW_MARGINS } },
-                    children: processItemsToParagraphs((await page.getTextContent()).items, { Document, Packer, Paragraph, TextRun }) 
-                });
-            }
         }
 
         if (abortController.signal.aborted) throw new Error('CANCELED');
 
         const doc = new Document({ sections: docSections });
         const blob = await Packer.toBlob(doc);
-        const suffixMap = { layout: "_Layout.docx", column: "_2Column.docx", ocr: "_OCR.docx", smart: "_SmartExam.docx" };
+        const suffixMap = { ocr: "_OCR.docx", smart: "_SmartExam.docx" };
         saveAs(blob, currentFile.name.replace('.pdf', '') + (suffixMap[convMode] || ".docx"));
 
         progressBar.style.width = '100%';
