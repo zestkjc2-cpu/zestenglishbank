@@ -200,8 +200,8 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
     if (items.length === 0) return [];
 
     // Noise filtering (Y-axis) - slightly more generous range
-    const topLimit = pageHeight * 0.95; 
-    const bottomLimit = pageHeight * 0.05;
+    const topLimit = pageHeight * 0.98; // Adjusted from 0.95
+    const bottomLimit = pageHeight * 0.02; // Adjusted from 0.05
     
     const filtered = items.filter(it => {
         const y = it.transform[5];
@@ -226,8 +226,8 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
     const blocks = [];
     let currentBlock = [];
 
-    // Enhanced heuristic: "1.", "1)", "1-2.", "[1-5]" etc.
-    const questionStartRegex = /^([0-9]{1,3}[\.\)]|\[[0-9]{1,3}([-~][0-9]{1,3})?\]|◈|◆|Q\d+)/;
+    // Enhanced heuristic: "1.", "1)", "1-2.", "[1-5]", "Q1", "번호", "문제" etc.
+    const questionStartRegex = /^([가-힣]{1,2}\d{0,3}[\.\)]?\s|[\d]{1,3}[\.\)]|\[[0-9]{1,3}([-~][0-9]{1,3})?\]|◈|◆|Q\d+|[*●■])|^\d+\s/;
 
     lines.forEach(line => {
         line.items.sort((a, b) => a.x - b.x);
@@ -238,10 +238,18 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
             if (currentBlock.length > 0) blocks.push(currentBlock);
             currentBlock = [lineText];
         } else {
-            if (currentBlock.length > 0) currentBlock.push(lineText);
+            // Fallback: If no block started yet but we have text, start a default block
+            if (currentBlock.length === 0) currentBlock = [lineText];
+            else currentBlock.push(lineText);
         }
     });
     if (currentBlock.length > 0) blocks.push(currentBlock);
+
+    if (blocks.length === 0 && filtered.length > 0) {
+        // Extreme fallback: just wrap all filtered lines
+        const allText = lines.map(l => l.items.map(i=>i.text).join(" ")).join("\n");
+        blocks.push([allText]);
+    }
 
     const paras = [];
     blocks.forEach(block => {
@@ -251,7 +259,7 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
                     text: line, 
                     font: "Pretendard", 
                     size: 24,
-                    bold: idx === 0 
+                    bold: idx === 0 && questionStartRegex.test(line)
                 })],
                 spacing: { before: idx === 0 ? 400 : 80, after: 80 }
             }));

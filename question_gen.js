@@ -36,20 +36,25 @@ closeModals.forEach(btn => {
     });
 });
 
-// Handle Option Card Selection
-optionCards.forEach(card => {
-    card.addEventListener('click', () => {
-        const type = card.dataset.type;
-        const checkbox = card.querySelector('input');
-        
-        card.classList.toggle('active');
-        checkbox.checked = !checkbox.checked;
-        
-        if (card.classList.contains('active')) {
-            if (!selectedTypes.includes(type)) selectedTypes.push(type);
-        } else {
-            selectedTypes = selectedTypes.filter(t => t !== type);
-        }
+const pdfPrintBtn = document.getElementById('pdfPrintBtn');
+
+// Handle Main Category Checkbox Sync
+document.querySelectorAll('.main-cat-check').forEach(mainCheck => {
+    mainCheck.addEventListener('change', (e) => {
+        const group = e.target.closest('.category-group');
+        const subChecks = group.querySelectorAll('.sub-items input[type="checkbox"]');
+        subChecks.forEach(sub => sub.checked = e.target.checked);
+    });
+});
+
+// Update sub-item behavior (uncheck main if all sub unchecked)
+document.querySelectorAll('.sub-items input[type="checkbox"]').forEach(subCheck => {
+    subCheck.addEventListener('change', (e) => {
+        const group = e.target.closest('.category-group');
+        const mainCheck = group.querySelector('.main-cat-check');
+        const subChecks = group.querySelectorAll('.sub-items input[type="checkbox"]');
+        const anyChecked = Array.from(subChecks).some(c => c.checked);
+        mainCheck.checked = anyChecked;
     });
 });
 
@@ -59,6 +64,13 @@ generateBtn.addEventListener('click', () => {
         alert('지문을 입력해주세요.');
         return;
     }
+    
+    // Collect selected sub-types
+    selectedTypes = [];
+    document.querySelectorAll('.sub-items input[type="checkbox"]:checked').forEach(cb => {
+        selectedTypes.push(cb.parentElement.textContent.trim());
+    });
+
     if (selectedTypes.length === 0) {
         alert('한 개 이상의 문제 유형을 선택해주세요.');
         return;
@@ -81,16 +93,24 @@ function startPreviewGeneration(text) {
     
     selectedTypes.forEach((type, idx) => {
         let q;
-        if (type === '대의 파악') {
-            q = createMultipleChoiceQuestion(text, "대의 파악 (Main Idea)");
-        } else if (type === '논리적 흐름') {
-            q = createOrderingQuestion(text);
-        } else if (type === '세부 정보 및 추론') {
-            q = createMultipleChoiceQuestion(text, "세부 정보 및 추론 (Detail Check)");
-        } else if (type === '어법 및 어휘') {
-            q = createGrammarQuestion(text);
-        } else if (type === '서술형') {
-            q = createSubjectiveQuestion(text);
+        // Map sub-types to generator functions (Simplified for demo)
+        if (text.length < 50) {
+            alert('지문이 너무 짧습니다. 좀 더 긴 지문을 입력해주세요.');
+            return;
+        }
+
+        if (type.includes('주제') || type.includes('목적') || type.includes('심경')) {
+            q = createMultipleChoiceQuestion(text, type);
+        } else if (type.includes('순서') || type.includes('삽입') || type.includes('무관') || type.includes('연결')) {
+            q = createOrderingQuestion(text, type);
+        } else if (type.includes('일치') || type.includes('빈칸') || type.includes('의미') || type.includes('지칭')) {
+            q = createMultipleChoiceQuestion(text, type);
+        } else if (type.includes('어법') || type.includes('어휘') || type.includes('요약')) {
+            q = createGrammarQuestion(text, type);
+        } else if (type.includes('영작') || type.includes('해석')) {
+            q = createSubjectiveQuestion(text, type);
+        } else {
+            q = createMultipleChoiceQuestion(text, type);
         }
         
         if (q) {
@@ -130,15 +150,13 @@ function renderPreviewItem(q, title) {
 }
 
 confirmAddBtn.addEventListener('click', () => {
-    // Clear container if starting fresh results or append if desired. 
-    // User requested "Add to list", so we append.
     previewBuffer.forEach(q => {
         generatedData.push(q);
-        renderQuestion(q, q.typeTitle || "변형문제");
+        renderQuestion(q, q.typeTitle || "변형문제", generatedData.length);
     });
     
     previewModal.classList.remove('active');
-    resultSection.style.display = 'block'; // Ensure it becomes visible
+    resultSection.style.display = 'block'; 
     setTimeout(() => {
         resultSection.scrollIntoView({ behavior: 'smooth' });
     }, 100);
@@ -151,7 +169,7 @@ function createMultipleChoiceQuestion(text, typeTitle) {
     return {
         type: 'multiple',
         typeTitle: typeTitle,
-        question: `다음 글의 제목으로 가장 적절한 것을 고르시오.`,
+        question: `다음 글의 제목(또는 유형 목적)으로 가장 적절한 것을 고르시오.`,
         passage: passage,
         options: [
             "Understanding the core concept of English education",
@@ -164,7 +182,7 @@ function createMultipleChoiceQuestion(text, typeTitle) {
     };
 }
 
-function createGrammarQuestion(text) {
+function createGrammarQuestion(text, typeTitle) {
     const grammarPoints = [
         { regex: /\b(is|are|was|were)\b/gi, choices: (m) => m.toLowerCase() === 'is' || m.toLowerCase() === 'was' ? ['is', 'are'] : ['are', 'is'] },
         { regex: /\b(which|that|who)\b/gi, choices: () => ['which', 'that'] },
@@ -186,13 +204,13 @@ function createGrammarQuestion(text) {
 
     return {
         type: 'grammar',
-        typeTitle: "어법 및 어휘",
+        typeTitle: typeTitle,
         passage: processedText,
         answer: answers.join(', ')
     };
 }
 
-function createOrderingQuestion(text) {
+function createOrderingQuestion(text, typeTitle) {
     const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
     const targetIdx = Math.floor(Math.random() * sentences.length);
     const targetSentence = sentences[targetIdx].trim();
@@ -207,7 +225,7 @@ function createOrderingQuestion(text) {
 
     return {
         type: 'ordering',
-        typeTitle: "논리적 흐름 (Sentence Ordering)",
+        typeTitle: typeTitle,
         question: `다음 밑줄 친 ( 1 )의 우리말과 일치하도록 <보기>의 단어들을 바르게 배열하시오.`,
         passage: newPassage,
         box: scrambled.join(' / '),
@@ -215,24 +233,21 @@ function createOrderingQuestion(text) {
     };
 }
 
-function createSubjectiveQuestion(text) {
-    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
-    const target = sentences[0].trim();
-    
+function createSubjectiveQuestion(text, typeTitle) {
     return {
         type: 'subjective',
-        typeTitle: "서술형 (Subjective)",
+        typeTitle: typeTitle,
         question: `다음 지문의 주제를 10단어 내외의 영어 문장으로 요약하여 서술하시오.`,
         passage: text.substring(0, 200) + "...",
         answer: "The importance of continuous learning in the digital transformation age."
     };
 }
 
-function renderQuestion(q, title) {
+function renderQuestion(q, title, number) {
     const div = document.createElement('div');
     div.className = 'question-item';
     
-    let html = `<h4>${title}</h4>`;
+    let html = `<h4><small style="color:var(--text-muted);">Question ${number}.</small> ${title}</h4>`;
     if (q.question) html += `<p class="question-text">${q.question}</p>`;
     html += `<div class="passage-box">${q.passage}</div>`;
     
@@ -249,6 +264,13 @@ function renderQuestion(q, title) {
     
     div.innerHTML = html;
     questionsContainer.appendChild(div);
+}
+
+// PDF Print Functionality
+if (pdfPrintBtn) {
+    pdfPrintBtn.addEventListener('click', () => {
+        window.print();
+    });
 }
 
 // Export to DOCX
