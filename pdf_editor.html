@@ -257,6 +257,134 @@
             font-size: 0.75rem;
             font-weight: 700;
         }
+
+        /* Visual Split Styles */
+        .visual-split-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .page-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+        }
+
+        .page-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+
+        .page-card.selected {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
+
+        .page-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--primary);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .page-thumb-img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1 / 1.4;
+            object-fit: contain;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .page-label {
+            margin-top: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .split-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .range-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .range-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .range-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .range-pages {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .range-name {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -370,13 +498,45 @@
                                 <p style="font-weight: 600; margin-top: 10px;">나눌 파일을 선택하세요.</p>
                                 <input type="file" id="splitFile" accept="application/pdf" style="display: none">
                             </div>
-                            <div id="splitInfo" class="control-panel" style="display: none;">
+                             <div id="splitInfo" class="control-panel" style="display: none;">
                                 <p><strong>선택된 파일:</strong> <span id="splitFileName"></span></p>
-                                <div style="margin-top: 15px;">
+                                
+                                <div class="visual-split-container">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label style="font-weight: 700;">페이지 선택 (미리보기)</label>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                            클릭하여 페이지 선택 / Shift+클릭으로 범위 선택
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="thumbnailGrid" class="thumbnail-grid">
+                                        <!-- Thumbnails will be rendered here -->
+                                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                                            페이지를 불러오는 중...
+                                        </div>
+                                    </div>
+
+                                    <div class="split-controls">
+                                        <div class="action-bar">
+                                            <button id="addRangeBtn" class="btn btn-outline btn-small" style="flex: 1;">선택한 페이지를 새 파일로 추가 +</button>
+                                            <button id="clearSelectionBtn" class="btn btn-outline btn-small">선택 해제</button>
+                                        </div>
+
+                                        <div id="rangeManager" style="display: none; margin-top: 10px;">
+                                            <label style="font-weight: 700; display: block; margin-bottom: 8px;">생성될 파일 목록</label>
+                                            <div id="rangeList" class="range-list">
+                                                <!-- Ranges will appear here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="runSplitBtn" class="btn btn-gradient" style="width: 100%; margin-top: 25px; display: none;">분할 및 다운로드 시작 🚀</button>
+                                
+                                <div id="oldSplitInput" style="display: none; margin-top: 15px;">
                                     <label>추출할 페이지 범위 (예: 1, 3-5):</label>
                                     <input type="text" id="splitRange" class="input-inline" placeholder="공백 시 전체 페이지를 각각 분할">
                                 </div>
-                                <button id="runSplitBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px;">분할 및 다운로드 🚀</button>
                             </div>
                         </div>
                     </div>
@@ -617,53 +777,157 @@
 
         // --- Split Logic ---
         let selectedSplitFile = null;
-        document.getElementById('splitFile').addEventListener('change', (e) => {
+        let splitRanges = []; // Array of arrays: [[0,1,2], [4,5]]
+        let lastSelectedIdx = null;
+
+        document.getElementById('splitFile').addEventListener('change', async (e) => {
             selectedSplitFile = e.target.files[0];
             if (selectedSplitFile) {
                 document.getElementById('splitInfo').style.display = 'block';
                 document.getElementById('splitFileName').textContent = selectedSplitFile.name;
+                
+                // Clear previous state
+                splitRanges = [];
+                updateRangeListUI();
+                renderSplitThumbnails(selectedSplitFile);
             }
         });
 
-        document.getElementById('runSplitBtn').addEventListener('click', async () => {
-            if (!selectedSplitFile) return;
-            const btn = document.getElementById('runSplitBtn');
-            const rangeStr = document.getElementById('splitRange').value.trim();
+        async function renderSplitThumbnails(file) {
+            const grid = document.getElementById('thumbnailGrid');
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">미리보기를 생성 중입니다...</div>';
+            
             try {
-                btn.disabled = true; btn.textContent = '처리 중...';
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const totalPages = pdf.numPages;
+                
+                grid.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({scale: 0.3});
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    await page.render({canvasContext: context, viewport}).promise;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'page-card';
+                    card.dataset.index = i - 1;
+                    card.innerHTML = `
+                        <img src="${canvas.toDataURL()}" class="page-thumb-img">
+                        <div class="page-label">Page ${i}</div>
+                    `;
+                    
+                    card.addEventListener('click', (e) => handlePageClick(e, i - 1));
+                    grid.appendChild(card);
+                }
+            } catch (err) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; color: #ef4444; padding: 20px;">미리보기를 불러오지 못했습니다: ${err.message}</div>`;
+            }
+        }
+
+        function handlePageClick(e, idx) {
+            const cards = document.querySelectorAll('.page-card');
+            
+            if (e.shiftKey && lastSelectedIdx !== null) {
+                // Range Selection
+                const start = Math.min(lastSelectedIdx, idx);
+                const end = Math.max(lastSelectedIdx, idx);
+                for (let i = start; i <= end; i++) {
+                    cards[i].classList.add('selected');
+                }
+            } else {
+                // Toggle single
+                cards[idx].classList.toggle('selected');
+                lastSelectedIdx = idx;
+            }
+        }
+
+        document.getElementById('clearSelectionBtn').addEventListener('click', () => {
+            document.querySelectorAll('.page-card').forEach(c => c.classList.remove('selected'));
+            lastSelectedIdx = null;
+        });
+
+        document.getElementById('addRangeBtn').addEventListener('click', () => {
+            const selectedCards = document.querySelectorAll('.page-card.selected');
+            if (selectedCards.length === 0) return alert('페이지를 먼저 선택해 주세요.');
+            
+            const indices = Array.from(selectedCards).map(c => parseInt(c.dataset.index)).sort((a, b) => a - b);
+            splitRanges.push(indices);
+            
+            // Unselect all after adding
+            document.querySelectorAll('.page-card.selected').forEach(c => c.classList.remove('selected'));
+            lastSelectedIdx = null;
+            
+            updateRangeListUI();
+        });
+
+        function updateRangeListUI() {
+            const manager = document.getElementById('rangeManager');
+            const list = document.getElementById('rangeList');
+            const runBtn = document.getElementById('runSplitBtn');
+            
+            if (splitRanges.length === 0) {
+                manager.style.display = 'none';
+                runBtn.style.display = 'none';
+                return;
+            }
+            
+            manager.style.display = 'block';
+            runBtn.style.display = 'block';
+            runBtn.textContent = `${splitRanges.length}개 파일로 분할 및 다운로드 🚀`;
+            
+            list.innerHTML = splitRanges.map((range, i) => {
+                const pageDisplay = range.length === 1 ? `${range[0] + 1}` : `${range[0] + 1} ~ ${range[range.length - 1] + 1}`;
+                return `
+                    <div class="range-item">
+                        <div class="range-info">
+                            <span class="range-pages">파일 ${i + 1}: ${range.length}페이지</span>
+                            <span class="range-name">(${pageDisplay})</span>
+                        </div>
+                        <span class="delete-btn" onclick="removeRange(${i})">삭제</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.removeRange = (index) => {
+            splitRanges.splice(index, 1);
+            updateRangeListUI();
+        };
+
+        document.getElementById('runSplitBtn').addEventListener('click', async () => {
+            if (!selectedSplitFile || splitRanges.length === 0) return;
+            const btn = document.getElementById('runSplitBtn');
+            try {
+                btn.disabled = true; btn.textContent = 'PDF 처리 중...';
+                
                 const bytes = await selectedSplitFile.arrayBuffer();
                 const sourcePdf = await PDFDocument.load(bytes);
-                const totalPages = sourcePdf.getPageCount();
                 
-                if (!rangeStr) {
-                    // Split into multi files (Simplified: just download first page for now or range logic)
-                    alert('범위를 입력해 주세요. (예: 1, 2-4)');
-                    return;
+                for (let i = 0; i < splitRanges.length; i++) {
+                    const indices = splitRanges[i];
+                    const newPdf = await PDFDocument.create();
+                    const copiedPages = await newPdf.copyPages(sourcePdf, indices);
+                    copiedPages.forEach(p => newPdf.addPage(p));
+                    const splitBytes = await newPdf.save();
+                    
+                    const suffix = splitRanges.length > 1 ? `_part${i + 1}` : '_split';
+                    saveAs(new Blob([splitBytes]), selectedSplitFile.name.replace('.pdf', `${suffix}.pdf`));
+                    
+                    // Small delay to prevent browser download blocking
+                    if (splitRanges.length > 1) await new Promise(r => setTimeout(r, 300));
                 }
-
-                // Parse Range: "1, 3-5" -> [0, 2, 3, 4]
-                const indices = [];
-                rangeStr.split(',').forEach(part => {
-                    const [start, end] = part.split('-').map(s => parseInt(s.trim()));
-                    if (isNaN(start)) return;
-                    if (!end) {
-                        if (start <= totalPages) indices.push(start - 1);
-                    } else {
-                        for (let i = start; i <= end && i <= totalPages; i++) {
-                            indices.push(i - 1);
-                        }
-                    }
-                });
-
-                if (indices.length === 0) throw new Error('올바른 페이지 범위를 입력하세요.');
-
-                const newPdf = await PDFDocument.create();
-                const copiedPages = await newPdf.copyPages(sourcePdf, indices);
-                copiedPages.forEach(p => newPdf.addPage(p));
-                const splitBytes = await newPdf.save();
-                saveAs(new Blob([splitBytes]), selectedSplitFile.name.replace('.pdf', '_split.pdf'));
-            } catch (err) { alert('오류: ' + err.message); }
-            finally { btn.disabled = false; btn.textContent = '분할 및 다운로드 🚀'; }
+                
+                alert('모든 파일이 생성되었습니다.');
+            } catch (err) { 
+                alert('오류: ' + err.message); 
+            } finally { 
+                btn.disabled = false; 
+                updateRangeListUI(); 
+            }
         });
     </script>
 </body>

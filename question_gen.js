@@ -64,7 +64,15 @@ generateBtn.addEventListener('click', () => {
         return;
     }
 
-    startPreviewGeneration(text);
+    // Add a slight "processing" feel
+    generateBtn.disabled = true;
+    generateBtn.innerText = "생성 중...";
+    
+    setTimeout(() => {
+        startPreviewGeneration(text);
+        generateBtn.disabled = false;
+        generateBtn.innerText = "변형문제 생성하기 🚀";
+    }, 800);
 });
 
 function startPreviewGeneration(text) {
@@ -122,14 +130,18 @@ function renderPreviewItem(q, title) {
 }
 
 confirmAddBtn.addEventListener('click', () => {
+    // Clear container if starting fresh results or append if desired. 
+    // User requested "Add to list", so we append.
     previewBuffer.forEach(q => {
         generatedData.push(q);
         renderQuestion(q, q.typeTitle || "변형문제");
     });
     
-    resultSection.style.display = 'block';
     previewModal.classList.remove('active');
-    resultSection.scrollIntoView({ behavior: 'smooth' });
+    resultSection.style.display = 'block'; // Ensure it becomes visible
+    setTimeout(() => {
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
 });
 
 function createMultipleChoiceQuestion(text, typeTitle) {
