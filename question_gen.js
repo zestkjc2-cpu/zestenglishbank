@@ -115,7 +115,7 @@ function startPreviewGeneration(text) {
         
         if (q) {
             previewBuffer.push(q);
-            renderPreviewItem(q, `추천 문항 ${idx + 1}: ${type}`);
+            renderPreviewItem(q, `${idx + 1}. ${type}`);
         }
     });
 

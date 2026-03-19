@@ -204,7 +204,7 @@
 
         /* Print Styles */
         @media print {
-            .header, .input-section, .modal-overlay, .btn, .header-actions, .section-header {
+            .header, .input-section, .modal-overlay, .btn, .header-actions, .section-header, #showTypeDesc {
                 display: none !important;
             }
             body {
@@ -220,16 +220,41 @@
                 box-shadow: none !important;
                 border: none !important;
                 padding: 0 !important;
+                margin-top: 0 !important;
             }
             .question-item {
                 page-break-inside: avoid;
-                border-bottom: 1px solid #eee;
-                margin-bottom: 30px;
+                border-bottom: 2px solid #eee;
+                margin-bottom: 40px;
+                padding-bottom: 30px;
             }
             .answer-key {
-                background: #f9f9f9 !important;
-                border: 1px solid #ddd !important;
-                color: black !important;
+                background: #f1f5f9 !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #1e293b !important;
+            }
+        }
+
+        /* Mobile Layout Support */
+        .selection-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            gap: 15px;
+        }
+
+        @media (max-width: 640px) {
+            .selection-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .selection-header button {
+                width: 100%;
+                text-align: center;
+                transform: none !important;
+                margin-top: 5px;
             }
         }
     </style>
@@ -261,9 +286,9 @@
                     <h3 style="margin-bottom: 15px;">1. 영어 지문 입력</h3>
                     <textarea class="passage-input" id="passageInput" placeholder="이곳에 영어 지문을 입력하거나 붙여넣으세요..."></textarea>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div class="selection-header">
                         <h3 style="margin: 0; font-size: 1.4rem;">2. 생성할 문제 유형 선택</h3>
-                        <button class="btn btn-outline" id="showTypeDesc" style="padding: 10px 20px; font-size: 1.25rem; transform: scale(1.5); transform-origin: right center; border-width: 2px; font-weight: 700;">문제 유형 설명 💡</button>
+                        <button class="btn btn-outline" id="showTypeDesc" style="padding: 6px 14px; font-size: 0.95rem; border-width: 1.5px; font-weight: 600;">문제 유형 설명 💡</button>
                     </div>
                     <div class="options-grid-detailed" id="typeGrid">
                         <!-- 1. 대의 파악 -->
@@ -353,6 +378,8 @@
                     <div style="display: flex; gap: 10px; margin-top: 20px;">
                         <button class="btn btn-gradient btn-large" id="generateBtn" style="flex: 2;">변형문제 생성하기 🚀</button>
                     </div>
+                </div>
+
                 <div class="result-section" id="resultSection">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                         <div>
