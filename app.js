@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(converterBtn) converterBtn.addEventListener('click', (e) => handleGatedLink(e, 'converter_select.html'));
     if(questionGenBtn) questionGenBtn.addEventListener('click', (e) => handleGatedLink(e, 'question_gen.html'));
     if(pdfEditBtn) pdfEditBtn.addEventListener('click', (e) => handleGatedLink(e, 'pdf_editor.html'));
-    if(workbookBtn) workbookBtn.addEventListener('click', (e) => handleGatedLink(e, 'trial.html'));
+    if(workbookBtn) workbookBtn.addEventListener('click', (e) => handleGatedLink(e, 'workbook.html'));
 
     closeModals.forEach(btn => {
         btn.addEventListener('click', () => {
