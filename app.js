@@ -179,16 +179,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 const brandSpan = logo.querySelector('.zest-brand');
                 if (brandSpan) brandSpan.classList.add('logged-in');
                 
-                // Add house icon if missing
-                if (!logo.querySelector('.home-icon-mini')) {
-                    // Remove any existing SVG home icons to keep it simple as per screenshot
+                // Remove emoji house icon if it was injected
+                const emojiIcon = logo.querySelector('.home-icon-mini');
+                if (emojiIcon) emojiIcon.remove();
+
+                // Only add original SVG icon on non-homepage sub-pages
+                if (!isHomePage && !logo.querySelector('svg')) {
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.setAttribute("width", "18");
+                    svg.setAttribute("height", "18");
+                    svg.setAttribute("viewBox", "0 0 24 24");
+                    svg.setAttribute("fill", "none");
+                    svg.setAttribute("stroke", "currentColor");
+                    svg.setAttribute("stroke-width", "2");
+                    svg.setAttribute("stroke-linecap", "round");
+                    svg.setAttribute("stroke-linejoin", "round");
+                    svg.style.marginLeft = "6px";
+                    svg.style.verticalAlign = "middle";
+                    svg.innerHTML = '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>';
+                    logo.appendChild(svg);
+                } else if (isHomePage) {
+                    // Ensure NO SVG icon on home page brand area
                     const existingSvg = logo.querySelector('svg');
                     if (existingSvg) existingSvg.remove();
-
-                    const span = document.createElement('span');
-                    span.className = 'home-icon-mini';
-                    span.innerText = '🏠';
-                    logo.appendChild(span);
                 }
             });
         } else {
