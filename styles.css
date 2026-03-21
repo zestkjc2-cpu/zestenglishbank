@@ -204,12 +204,6 @@ ul {
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
-.home-icon-mini {
-    margin-left: 6px;
-    font-size: 1.1rem;
-    vertical-align: middle;
-}
-
 /* Modal specific tweaks */
 .btn-full.auth-dynamic-btn {
     width: 100%;
