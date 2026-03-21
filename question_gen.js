@@ -21,10 +21,43 @@ const recommendBtn = document.getElementById('recommendBtn');
 let selectedTypes = ['대의 파악']; // Default to first type
 let generatedData = [];
 let previewBuffer = [];
+let currentTransMode = 'original';
 
 // AI Recommendation Logic
 if (recommendBtn) {
     recommendBtn.addEventListener('click', analyzePassageAndRecommend);
+}
+
+// Passage Transformation Tab Logic
+const transTabs = document.querySelectorAll('.trans-tab');
+transTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+        transTabs.forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTransMode = e.target.getAttribute('data-mode');
+    });
+});
+
+function applyPassageTransformation(text) {
+    if (!text) return "";
+    
+    switch (currentTransMode) {
+        case 'before':
+            return "[Introductory Context Added] In light of modern perspectives, it is essential to consider the following background: " + text;
+        case 'after':
+            return text + " [Concluding Context Added] Ultimately, this highlights the broader implications of the theory discussed above.";
+        case 'between':
+            // Simple split and insert in middle
+            const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+            if (sentences.length > 2) {
+                const mid = Math.floor(sentences.length / 2);
+                sentences.splice(mid, 0, " [Modified transition for internal context] Furthermore, this specific aspect suggests a deeper layer of complexity. ");
+                return sentences.join("");
+            }
+            return text + " [Modified internally]";
+        default:
+            return text;
+    }
 }
 
 function analyzePassageAndRecommend() {
@@ -199,26 +232,24 @@ function startPreviewGeneration(text) {
     previewBuffer = [];
     previewContainer.innerHTML = '';
     
+    // Apply transformation before generating the set
+    const modifiedPassage = applyPassageTransformation(text);
+
     selectedTypes.forEach((type, idx) => {
         let q;
-        // Map sub-types to generator functions (Simplified for demo)
-        if (text.length < 50) {
-            alert('지문이 너무 짧습니다. 좀 더 긴 지문을 입력해주세요.');
-            return;
-        }
-
+        // Map sub-types to generator functions
         if (type.includes('주제') || type.includes('목적') || type.includes('심경')) {
-            q = createMultipleChoiceQuestion(text, type);
+            q = createMultipleChoiceQuestion(modifiedPassage, type);
         } else if (type.includes('순서') || type.includes('삽입') || type.includes('무관') || type.includes('연결')) {
-            q = createOrderingQuestion(text, type);
+            q = createOrderingQuestion(modifiedPassage, type);
         } else if (type.includes('일치') || type.includes('빈칸') || type.includes('의미') || type.includes('지칭')) {
-            q = createMultipleChoiceQuestion(text, type);
+            q = createMultipleChoiceQuestion(modifiedPassage, type);
         } else if (type.includes('어법') || type.includes('어휘') || type.includes('요약')) {
-            q = createGrammarQuestion(text, type);
+            q = createGrammarQuestion(modifiedPassage, type);
         } else if (type.includes('영작') || type.includes('해석')) {
-            q = createSubjectiveQuestion(text, type);
+            q = createSubjectiveQuestion(modifiedPassage, type);
         } else {
-            q = createMultipleChoiceQuestion(text, type);
+            q = createMultipleChoiceQuestion(modifiedPassage, type);
         }
         
         if (q) {
@@ -271,14 +302,11 @@ confirmAddBtn.addEventListener('click', () => {
 });
 
 function createMultipleChoiceQuestion(text, typeTitle) {
-    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
-    const passage = sentences.slice(0, 3).join(' ') + (sentences.length > 3 ? "..." : "");
-    
     return {
         type: 'multiple',
         typeTitle: typeTitle,
         question: `다음 글의 제목(또는 유형 목적)으로 가장 적절한 것을 고르시오.`,
-        passage: passage,
+        passage: text, // Use full text
         options: [
             "Understanding the core concept of English education",
             "The evolution of artificial intelligence in learning",
@@ -346,7 +374,7 @@ function createSubjectiveQuestion(text, typeTitle) {
         type: 'subjective',
         typeTitle: typeTitle,
         question: `다음 지문의 주제를 10단어 내외의 영어 문장으로 요약하여 서술하시오.`,
-        passage: text.substring(0, 200) + "...",
+        passage: text, // Use full text
         answer: "The importance of continuous learning in the digital transformation age."
     };
 }
