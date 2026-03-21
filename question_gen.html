@@ -196,10 +196,11 @@
             cursor: pointer;
         }
 
-        .sub-items input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+        .category-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
+            vertical-align: middle;
         }
 
         /* Print Styles */
@@ -294,25 +295,23 @@
                         <!-- 1. 대의 파악 -->
                         <div class="category-group" data-category="대의 파악">
                             <div class="category-header">
-                                <label class="custom-checkbox">
-                                    <input type="checkbox" class="main-cat-check" data-type="대의 파악" checked>
-                                    <span class="checkmark"></span>
+                                <label>
+                                    <input type="checkbox" class="main-cat-check" data-type="대의 파악">
                                     <strong>1. 대의 파악</strong>
                                 </label>
                             </div>
                             <div class="sub-items">
-                                <label><input type="checkbox" value="주제/제목/요지/주장 찾기" checked> 주제/제목/요지/주장 찾기</label>
-                                <label><input type="checkbox" value="글의 목적" checked> 글의 목적</label>
-                                <label><input type="checkbox" value="심경 및 분위기" checked> 심경 및 분위기</label>
+                                <label><input type="checkbox" value="주제/제목/요지/주장 찾기"> 주제/제목/요지/주장 찾기</label>
+                                <label><input type="checkbox" value="글의 목적"> 글의 목적</label>
+                                <label><input type="checkbox" value="심경 및 분위기"> 심경 및 분위기</label>
                             </div>
                         </div>
 
                         <!-- 2. 논리적 흐름 -->
                         <div class="category-group" data-category="논리적 흐름">
                             <div class="category-header">
-                                <label class="custom-checkbox">
+                                <label>
                                     <input type="checkbox" class="main-cat-check" data-type="논리적 흐름">
-                                    <span class="checkmark"></span>
                                     <strong>2. 논리적 흐름</strong>
                                 </label>
                             </div>
@@ -327,9 +326,8 @@
                         <!-- 3. 세부 정보 및 추론 -->
                         <div class="category-group" data-category="세부 정보 및 추론">
                             <div class="category-header">
-                                <label class="custom-checkbox">
+                                <label>
                                     <input type="checkbox" class="main-cat-check" data-type="세부 정보 및 추론">
-                                    <span class="checkmark"></span>
                                     <strong>3. 세부 정보 및 추론</strong>
                                 </label>
                             </div>
@@ -344,9 +342,8 @@
                         <!-- 4. 어법 및 어휘 -->
                         <div class="category-group" data-category="어법 및 어휘">
                             <div class="category-header">
-                                <label class="custom-checkbox">
+                                <label>
                                     <input type="checkbox" class="main-cat-check" data-type="어법 및 어휘">
-                                    <span class="checkmark"></span>
                                     <strong>4. 어법 및 어휘</strong>
                                 </label>
                             </div>
@@ -360,9 +357,8 @@
                         <!-- 5. 서술형 -->
                         <div class="category-group" data-category="서술형">
                             <div class="category-header">
-                                <label class="custom-checkbox">
+                                <label>
                                     <input type="checkbox" class="main-cat-check" data-type="서술형">
-                                    <span class="checkmark"></span>
                                     <strong>5. 서술형</strong>
                                 </label>
                             </div>
