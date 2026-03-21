@@ -16,9 +16,117 @@ const previewModal = document.getElementById('previewModal');
 const previewContainer = document.getElementById('previewContainer');
 const confirmAddBtn = document.getElementById('confirmAddBtn');
 
+const recommendBtn = document.getElementById('recommendBtn');
+
 let selectedTypes = ['대의 파악']; // Default to first type
 let generatedData = [];
 let previewBuffer = [];
+
+// AI Recommendation Logic
+if (recommendBtn) {
+    recommendBtn.addEventListener('click', analyzePassageAndRecommend);
+}
+
+function analyzePassageAndRecommend() {
+    const text = passageInput.value.trim();
+    if (!text) {
+        alert('분석할 지문을 먼저 입력해주세요.');
+        return;
+    }
+
+    recommendBtn.disabled = true;
+    recommendBtn.innerText = "분석 중...";
+
+    setTimeout(() => {
+        // 1. Reset all checkboxes
+        document.querySelectorAll('.options-grid-detailed input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+        const lowerText = text.toLowerCase();
+        const recommendedCategories = [];
+
+        // 2. Heuristic Analysis
+        // Always suggest Main Idea if text is long enough
+        if (text.length > 100) {
+            recommendedCategories.push("대의 파악");
+            checkSubItem("주제/제목/요지/주장 찾기");
+        }
+
+        // Logic Flow / Connectors
+        const connectors = ["however", "therefore", "moreover", "furthermore", "instead", "nonetheless", "first", "second", "finally", "consequently"];
+        if (connectors.some(word => lowerText.includes(word))) {
+            recommendedCategories.push("논리적 흐름");
+            checkSubItem("연결어 추론");
+            checkSubItem("문장 삽입");
+            checkSubItem("글의 순서 배열");
+        }
+
+        // Purpose
+        const purposeWords = ["want", "please", "request", "sincerely", "inform", "announce", "offer", "purpose"];
+        if (purposeWords.some(word => lowerText.includes(word))) {
+            recommendedCategories.push("대의 파악");
+            checkSubItem("글의 목적");
+        }
+
+        // Sentiment
+        const sentimentWords = ["happy", "sad", "afraid", "scared", "beautiful", "dark", "bright", "lonely", "excited", "nervous", "angry"];
+        if (sentimentWords.some(word => lowerText.includes(word))) {
+            recommendedCategories.push("대의 파악");
+            checkSubItem("심경 및 분위기");
+        }
+
+        // Detail / Inference
+        if (text.length > 300) {
+            recommendedCategories.push("세부 정보 및 추론");
+            checkSubItem("내용 일치/불일치");
+            checkSubItem("빈칸 추론");
+        }
+
+        // Grammar / Vocab (Almost always recommended)
+        recommendedCategories.push("어법 및 어휘");
+        checkSubItem("어법상 어색한/적절한 것");
+        checkSubItem("문맥상 어색한/적절한 어휘");
+        if (text.length > 400) checkSubItem("요약문 완성");
+
+        // Descriptive (Subjective)
+        if (text.length > 250) {
+            recommendedCategories.push("서술형");
+            checkSubItem("단어 배열 영작");
+            checkSubItem("우리말 해석 및 요약");
+        }
+
+        // 3. Sync Main Categories
+        document.querySelectorAll('.main-cat-check').forEach(main => {
+            const type = main.getAttribute('data-type');
+            if (recommendedCategories.includes(type)) {
+                main.checked = true;
+            }
+        });
+
+        recommendBtn.disabled = false;
+        recommendBtn.innerText = "AI 추천 유형 분석 🔍";
+        
+        // Final sanity check: if nothing selected, select basic one
+        const anyChecked = document.querySelectorAll('.sub-items input[type="checkbox"]:checked').length > 0;
+        if (!anyChecked) {
+            const mainDae = document.querySelector('.main-cat-check[data-type="대의 파악"]');
+            if (mainDae) mainDae.checked = true;
+            checkSubItem("주제/제목/요지/주장 찾기");
+        }
+
+        alert('지문 분석 결과, 가장 적합한 문제 유형들이 선택되었습니다! ✨');
+    }, 1000);
+}
+
+function checkSubItem(value) {
+    const cb = document.querySelector(`.sub-items input[value="${value}"]`);
+    if (cb) {
+        cb.checked = true;
+        // Also ensure parent is checked
+        const group = cb.closest('.category-group');
+        const main = group.querySelector('.main-cat-check');
+        if (main) main.checked = true;
+    }
+}
 
 // ... syncUI exists above ...
 
