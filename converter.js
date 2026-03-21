@@ -97,11 +97,11 @@ function handleFile(file) {
  * Heuristic to merge lines into a single sentence for Exam Questions
  */
 function reconstructParagraphs(text) {
-    const lines = text.split('\n');
+    const rawLines = text.split('\n');
     let reconstructed = [];
     let currentPara = "";
 
-    lines.forEach(line => {
+    rawLines.forEach(line => {
         const trimmed = line.trim();
         if (!trimmed) {
             if (currentPara) reconstructed.push(currentPara);
@@ -110,10 +110,10 @@ function reconstructParagraphs(text) {
         }
 
         if (currentPara) {
-            // If the previous line doesn't end with a terminal or current starts with lowercase/punctuation
-            const lastChar = currentPara.slice(-1);
-            const isTerminal = '.?!:)]'.includes(lastChar);
-            const startsWithLower = /^[a-z가-힣0-9]/.test(trimmed) && !/^[A-Z]/.test(trimmed);
+            // Join if previous doesn't end with terminal or current starts with lowercase
+            const lastChar = currentPara.trim().slice(-1);
+            const isTerminal = '.?!'.includes(lastChar);
+            const startsWithLower = /^[a-z]/.test(trimmed);
 
             if (!isTerminal || startsWithLower) {
                 currentPara += " " + trimmed;
@@ -186,7 +186,33 @@ async function extractQuestionBlocks(page, docxComponents) {
     
     if (items.length === 0) return [];
 
-    const midX = viewport.width / 2;
+    // --- Dynamic Column Detection ---
+    // Analyze distribution of X coordinates to find a vertical gap near the middle
+    let midX = viewport.width / 2;
+    const xPositions = items.map(it => it.transform[4]).sort((a, b) => a - b);
+    
+    // Find gaps between 30% and 70% of the page width
+    const minCenter = viewport.width * 0.3;
+    const maxCenter = viewport.width * 0.7;
+    let maxGap = 0;
+    let gapStart = midX;
+
+    for (let i = 0; i < xPositions.length - 1; i++) {
+        const x = xPositions[i];
+        if (x < minCenter || x > maxCenter) continue;
+        const nextX = xPositions[i+1];
+        const gap = nextX - x;
+        if (gap > maxGap) {
+            maxGap = gap;
+            gapStart = x;
+        }
+    }
+    
+    // If a significant gap (> 20px) is found, use it as the split point
+    if (maxGap > 20) {
+        midX = gapStart + (maxGap / 2);
+    }
+
     const leftItems = items.filter(it => it.transform[4] < midX);
     const rightItems = items.filter(it => it.transform[4] >= midX);
 
@@ -253,17 +279,42 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
 
     const paras = [];
     blocks.forEach(block => {
+        let currentMergedPara = "";
+        
         block.forEach((line, idx) => {
+            const trimmedLine = line.trim();
+            if (!trimmedLine) return;
+
+            // Merge logic: if it's the first line of a block (question start) or looks like a list item, start a new para
+            // Otherwise, join with previous unless previous ends with period.
+            const isQuestionStart = questionStartRegex.test(trimmedLine);
+            const lastChar = currentMergedPara.trim().slice(-1);
+            const isTerminal = '.?!'.includes(lastChar);
+
+            if (idx === 0 || isQuestionStart || isTerminal) {
+                if (currentMergedPara) {
+                    paras.push(new Paragraph({
+                        children: [new TextRun({ text: currentMergedPara, font: "Pretendard", size: 24 })],
+                        spacing: { before: 200, after: 200 }
+                    }));
+                }
+                currentMergedPara = trimmedLine;
+            } else {
+                currentMergedPara += " " + trimmedLine;
+            }
+        });
+
+        if (currentMergedPara) {
             paras.push(new Paragraph({
                 children: [new TextRun({ 
-                    text: line, 
+                    text: currentMergedPara, 
                     font: "Pretendard", 
                     size: 24,
-                    bold: idx === 0 && questionStartRegex.test(line)
+                    bold: questionStartRegex.test(currentMergedPara.split(' ')[0])
                 })],
-                spacing: { before: idx === 0 ? 400 : 80, after: 80 }
+                spacing: { before: 200, after: 200 }
             }));
-        });
+        }
     });
     
     return paras;
