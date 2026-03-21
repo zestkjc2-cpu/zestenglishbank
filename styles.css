@@ -165,6 +165,51 @@ ul {
     border-color: var(--primary-light) !important;
 }
 
+/* Unified Header Back/Logout Style (Indigo-Blue theme) */
+.global-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #1e293b;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.global-back-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: var(--primary);
+}
+
+.logout-btn-solid {
+    background: #4F46E5 !important; /* Specific Screenshot Blue/Purple */
+    color: #ffffff !important;
+    padding: 8px 24px;
+    border: none !important;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn-solid:hover {
+    background: #4338ca !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.home-icon-mini {
+    margin-left: 6px;
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+
 /* Modal specific tweaks */
 .btn-full.auth-dynamic-btn {
     width: 100%;
@@ -229,7 +274,7 @@ ul {
 
 .logged-in .zest-brand,
 .zest-brand.logged-in {
-    background: #4F46E5;
+    background: #4F46E5; /* Solid Indigo for logged in */
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

@@ -148,8 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (session) {
             // Change Nav Login to Logout
-            loginBtn.className = 'nav-link primary-btn';
-            updateBtn(loginBtn, 'Logout', true);
+            if (loginBtn) {
+                loginBtn.className = 'logout-btn-solid';
+                updateBtn(loginBtn, 'Logout', true);
+            }
             // Change Hero Login to Logout
             updateBtn(entryLoginBtn, '로그아웃 <span>👤</span>', true);
             dynamicElements.forEach(el => el && el.classList.add('logged-in'));
@@ -161,11 +163,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 const backBtn = document.createElement('a');
                 backBtn.id = 'globalBackBtn';
                 backBtn.href = 'javascript:history.back()';
-                backBtn.className = 'nav-link outline-link';
+                backBtn.className = 'global-back-btn';
                 backBtn.style.marginRight = '12px';
                 backBtn.innerHTML = '← 뒤로가기';
                 headerActions.insertBefore(backBtn, loginBtn);
             }
+
+            // Sync Brand name Indigo color and Icon
+            document.querySelectorAll('.brand-logo').forEach(logo => {
+                const brandSpan = logo.querySelector('.zest-brand');
+                if (brandSpan) brandSpan.classList.add('logged-in');
+                
+                // Add house icon if missing
+                if (!logo.querySelector('.home-icon-mini')) {
+                    // Remove any existing SVG home icons to keep it simple as per screenshot
+                    const existingSvg = logo.querySelector('svg');
+                    if (existingSvg) existingSvg.remove();
+
+                    const span = document.createElement('span');
+                    span.className = 'home-icon-mini';
+                    span.innerText = '🏠';
+                    logo.appendChild(span);
+                }
+            });
         } else {
             dynamicElements.forEach(el => el && el.classList.remove('logged-in'));
             // Auto open login modal if requested via URL
