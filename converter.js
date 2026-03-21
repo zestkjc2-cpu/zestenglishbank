@@ -404,9 +404,6 @@ convertBtn.addEventListener('click', async () => {
                 statusText.textContent = `페이지 OCR 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
-                // Use dynamic split detection for OCR too
-                const { Paragraph, TextRun, PageBreak } = { Paragraph: docxComponents.Paragraph, TextRun: docxComponents.TextRun, PageBreak: docxComponents.PageBreak };
-                const dummyDocx = { Paragraph, TextRun, PageBreak };
                 const page = await pdf.getPage(i);
                 
                 // Get midX using the same Peak Alignment logic

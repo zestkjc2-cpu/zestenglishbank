@@ -168,19 +168,46 @@ convertBtn.addEventListener('click', async () => {
                 statusText.textContent = `페이지 OCR 분석 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
 
+                // Use dynamic split detection for OCR too
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 2.5 });
+                
+                // Get midX using the same Peak Alignment logic
+                const content = await page.getTextContent();
+                const items = content.items;
+                const viewport = page.getViewport({ scale: 1 });
+                let midX = viewport.width / 2;
+                if (items.length > 0) {
+                    const xFreq = {};
+                    items.forEach(it => {
+                        const x = Math.round(it.transform[4] / 10) * 10;
+                        if (x < viewport.width * 0.1 || x > viewport.width * 0.9) return;
+                        xFreq[x] = (xFreq[x] || 0) + 1;
+                    });
+                    const sortedX = Object.keys(xFreq).sort((a, b) => xFreq[b] - xFreq[a]);
+                    let pL = -1, pR = -1;
+                    for (const xStr of sortedX) {
+                        const x = parseInt(xStr);
+                        if (pL === -1) pL = x;
+                        else if (Math.abs(x - pL) > viewport.width * 0.2) { pR = x; break; }
+                    }
+                    if (pL !== -1 && pR !== -1) midX = (pL + pR) / 2;
+                }
+
+                const canvasScale = 2.5; 
+                const canvasViewport = page.getViewport({ scale: canvasScale });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
-                
-                // Crop into columns
-                const midX = canvas.width / 2;
+                canvas.height = canvasViewport.height;
+                canvas.width = canvasViewport.width;
+
+                await page.render({ canvasContext: context, viewport: canvasViewport }).promise;
+
+                const splitFactor = midX / viewport.width;
+                const splitX = canvas.width * splitFactor;
+
                 const columns = [
-                    { x: 0, y: 0, w: midX, h: canvas.height },
-                    { x: midX, y: 0, w: midX, h: canvas.height }
+                    { x: 0, y: 0, w: splitX, h: canvas.height },
+                    { x: splitX, y: 0, w: canvas.width - splitX, h: canvas.height }
                 ];
 
                 for (const col of columns) {
@@ -206,12 +233,31 @@ convertBtn.addEventListener('click', async () => {
 
                 const page = await pdf.getPage(i);
                 const viewport = page.getViewport({ scale: 1.0 });
-                const midX = viewport.width / 2;
+                
+                // Get midX using the same Peak Alignment logic
                 const textContent = await page.getTextContent();
+                const items = textContent.items;
+                let midX = viewport.width / 2;
+                if (items.length > 0) {
+                    const xFreq = {};
+                    items.forEach(it => {
+                        const x = Math.round(it.transform[4] / 10) * 10;
+                        if (x < viewport.width * 0.1 || x > viewport.width * 0.9) return;
+                        xFreq[x] = (xFreq[x] || 0) + 1;
+                    });
+                    const sortedX = Object.keys(xFreq).sort((a, b) => xFreq[b] - xFreq[a]);
+                    let pL = -1, pR = -1;
+                    for (const xStr of sortedX) {
+                        const x = parseInt(xStr);
+                        if (pL === -1) pL = x;
+                        else if (Math.abs(x - pL) > viewport.width * 0.2) { pR = x; break; }
+                    }
+                    if (pL !== -1 && pR !== -1) midX = (pL + pR) / 2;
+                }
                 
                 const leftItems = [];
                 const rightItems = [];
-                textContent.items.forEach(item => {
+                items.forEach(item => {
                     if (item.transform[4] < midX) leftItems.push(item);
                     else rightItems.push(item);
                 });
