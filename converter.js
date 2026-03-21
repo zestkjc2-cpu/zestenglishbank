@@ -186,44 +186,39 @@ async function extractQuestionBlocks(page, docxComponents) {
     
     if (items.length === 0) return [];
 
-    // --- Dynamic Column Detection (Occupancy Shadow) ---
-    const shadowArr = new Float32Array(Math.ceil(viewport.width));
-    items.forEach(it => {
-        const xStart = Math.max(0, Math.floor(it.transform[4]));
-        const xEnd = Math.min(shadowArr.length - 1, Math.ceil(it.transform[4] + (it.width || 0)));
-        for (let x = xStart; x <= xEnd; x++) shadowArr[x] = 1;
+    // --- Dynamic Column Detection (Density-based) ---
+    // Filter out items that are likely headers/footers or full-width spans
+    const colItems = items.filter(it => {
+        const y = it.transform[5];
+        return y < viewport.height * 0.9 && y > viewport.height * 0.1 && it.width < viewport.width * 0.6;
     });
 
-    // Find the widest 0-gap (gutter) in the center 30-70%
-    const minCenter = Math.floor(viewport.width * 0.3);
-    const maxCenter = Math.floor(viewport.width * 0.7);
-    let bestMidX = viewport.width / 2;
-    let maxGutterWidth = 0;
-    let currentGutterStart = -1;
+    const shadowArr = new Int32Array(Math.ceil(viewport.width));
+    colItems.forEach(it => {
+        const xStart = Math.max(0, Math.floor(it.transform[4]));
+        const xEnd = Math.min(shadowArr.length - 1, Math.ceil(it.transform[4] + (it.width || 0)));
+        for (let x = xStart; x <= xEnd; x++) shadowArr[x]++;
+    });
+
+    // Find the X in the center 40-60% with the LOWEST density (ideally 0)
+    const minCenter = Math.floor(viewport.width * 0.4);
+    const maxCenter = Math.floor(viewport.width * 0.6);
+    let minDensity = Infinity;
+    let bestX = viewport.width / 2;
 
     for (let x = minCenter; x <= maxCenter; x++) {
-        if (shadowArr[x] === 0) {
-            if (currentGutterStart === -1) currentGutterStart = x;
-        } else {
-            if (currentGutterStart !== -1) {
-                const gutterWidth = x - currentGutterStart;
-                if (gutterWidth > maxGutterWidth) {
-                    maxGutterWidth = gutterWidth;
-                    bestMidX = currentGutterStart + (gutterWidth / 2);
-                }
-                currentGutterStart = -1;
+        if (shadowArr[x] < minDensity) {
+            minDensity = shadowArr[x];
+            bestX = x;
+        } else if (shadowArr[x] === minDensity) {
+            // If tied, pick the one closer to the absolute center
+            if (Math.abs(x - viewport.width / 2) < Math.abs(bestX - viewport.width / 2)) {
+                bestX = x;
             }
         }
     }
-    // Final check if gutter ends at maxCenter
-    if (currentGutterStart !== -1) {
-        const gutterWidth = maxCenter - currentGutterStart;
-        if (gutterWidth > maxGutterWidth) {
-            bestMidX = currentGutterStart + (gutterWidth / 2);
-        }
-    }
 
-    const midX = bestMidX;
+    const midX = bestX;
 
     const leftItems = items.filter(it => it.transform[4] < midX);
     const rightItems = items.filter(it => it.transform[4] >= midX);
