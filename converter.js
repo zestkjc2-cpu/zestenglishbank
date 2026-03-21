@@ -186,32 +186,44 @@ async function extractQuestionBlocks(page, docxComponents) {
     
     if (items.length === 0) return [];
 
-    // --- Dynamic Column Detection ---
-    // Analyze distribution of X coordinates to find a vertical gap near the middle
-    let midX = viewport.width / 2;
-    const xPositions = items.map(it => it.transform[4]).sort((a, b) => a - b);
-    
-    // Find gaps between 30% and 70% of the page width
-    const minCenter = viewport.width * 0.3;
-    const maxCenter = viewport.width * 0.7;
-    let maxGap = 0;
-    let gapStart = midX;
+    // --- Dynamic Column Detection (Occupancy Shadow) ---
+    const shadowArr = new Float32Array(Math.ceil(viewport.width));
+    items.forEach(it => {
+        const xStart = Math.max(0, Math.floor(it.transform[4]));
+        const xEnd = Math.min(shadowArr.length - 1, Math.ceil(it.transform[4] + (it.width || 0)));
+        for (let x = xStart; x <= xEnd; x++) shadowArr[x] = 1;
+    });
 
-    for (let i = 0; i < xPositions.length - 1; i++) {
-        const x = xPositions[i];
-        if (x < minCenter || x > maxCenter) continue;
-        const nextX = xPositions[i+1];
-        const gap = nextX - x;
-        if (gap > maxGap) {
-            maxGap = gap;
-            gapStart = x;
+    // Find the widest 0-gap (gutter) in the center 30-70%
+    const minCenter = Math.floor(viewport.width * 0.3);
+    const maxCenter = Math.floor(viewport.width * 0.7);
+    let bestMidX = viewport.width / 2;
+    let maxGutterWidth = 0;
+    let currentGutterStart = -1;
+
+    for (let x = minCenter; x <= maxCenter; x++) {
+        if (shadowArr[x] === 0) {
+            if (currentGutterStart === -1) currentGutterStart = x;
+        } else {
+            if (currentGutterStart !== -1) {
+                const gutterWidth = x - currentGutterStart;
+                if (gutterWidth > maxGutterWidth) {
+                    maxGutterWidth = gutterWidth;
+                    bestMidX = currentGutterStart + (gutterWidth / 2);
+                }
+                currentGutterStart = -1;
+            }
         }
     }
-    
-    // If a significant gap (> 20px) is found, use it as the split point
-    if (maxGap > 20) {
-        midX = gapStart + (maxGap / 2);
+    // Final check if gutter ends at maxCenter
+    if (currentGutterStart !== -1) {
+        const gutterWidth = maxCenter - currentGutterStart;
+        if (gutterWidth > maxGutterWidth) {
+            bestMidX = currentGutterStart + (gutterWidth / 2);
+        }
     }
+
+    const midX = bestMidX;
 
     const leftItems = items.filter(it => it.transform[4] < midX);
     const rightItems = items.filter(it => it.transform[4] >= midX);
@@ -277,7 +289,6 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
         blocks.push([allText]);
     }
 
-    const paras = [];
     blocks.forEach(block => {
         let currentMergedPara = "";
         
@@ -285,21 +296,24 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
             const trimmedLine = line.trim();
             if (!trimmedLine) return;
 
-            // Merge logic: if it's the first line of a block (question start) or looks like a list item, start a new para
-            // Otherwise, join with previous unless previous ends with period.
+            // Merge logic: If previous does NOT end with a period, join onto same line.
             const isQuestionStart = questionStartRegex.test(trimmedLine);
             const lastChar = currentMergedPara.trim().slice(-1);
             const isTerminal = '.?!'.includes(lastChar);
+            
+            // Treat colon (:) as a break too if it's likely a header
+            const isHeaderBreak = currentMergedPara.includes(':') && currentMergedPara.length < 50;
 
-            if (idx === 0 || isQuestionStart || isTerminal) {
+            if (idx === 0 || isQuestionStart || isTerminal || isHeaderBreak) {
                 if (currentMergedPara) {
                     paras.push(new Paragraph({
                         children: [new TextRun({ text: currentMergedPara, font: "Pretendard", size: 24 })],
-                        spacing: { before: 200, after: 200 }
+                        spacing: { before: 150, after: 150 }
                     }));
                 }
                 currentMergedPara = trimmedLine;
             } else {
+                // Join without a new line!
                 currentMergedPara += " " + trimmedLine;
             }
         });
@@ -312,11 +326,11 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
                     size: 24,
                     bold: questionStartRegex.test(currentMergedPara.split(' ')[0])
                 })],
-                spacing: { before: 200, after: 200 }
+                spacing: { before: 150, after: 150 }
             }));
         }
     });
-    
+
     return paras;
 }
 
