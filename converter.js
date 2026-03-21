@@ -113,10 +113,15 @@ function reconstructParagraphs(text) {
             // Join if previous doesn't end with terminal or current starts with lowercase
             const lastChar = currentPara.trim().slice(-1);
             const isTerminal = '.?!'.includes(lastChar);
-            const startsWithLower = /^[a-z]/.test(trimmed);
+            const firstChar = trimmed[0];
+            const startsWithLower = /^[a-z]/.test(firstChar);
 
             if (!isTerminal || startsWithLower) {
-                currentPara += " " + trimmed;
+                if (lastChar === '-' && startsWithLower) {
+                    currentPara = currentPara.trim().slice(0, -1) + trimmed;
+                } else {
+                    currentPara += " " + trimmed;
+                }
             } else {
                 reconstructed.push(currentPara);
                 currentPara = trimmed;
@@ -220,12 +225,14 @@ async function extractQuestionBlocks(page, docxComponents) {
 
     const midX = bestX;
 
-    const leftItems = items.filter(it => it.transform[4] < midX);
-    const rightItems = items.filter(it => it.transform[4] >= midX);
-
     const leftParas = getBlocksFromItems(leftItems, viewport.height, docxComponents);
     const rightParas = getBlocksFromItems(rightItems, viewport.height, docxComponents);
+    const { Paragraph, PageBreak } = docxComponents;
 
+    // Sequential output: Left first, then a PageBreak, then Right.
+    if (leftParas.length > 0 && rightParas.length > 0) {
+        return [...leftParas, new Paragraph({ children: [new PageBreak()] }), ...rightParas];
+    }
     return [...leftParas, ...rightParas];
 }
 
@@ -308,8 +315,15 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
                 }
                 currentMergedPara = trimmedLine;
             } else {
-                // Join without a new line!
-                currentMergedPara += " " + trimmedLine;
+                // Word-joining logic: Handle hyphens and word breaks
+                const firstChar = trimmedLine[0];
+                if (lastChar === '-' && /^[a-z]/.test(firstChar)) {
+                    // Remove hyphen and join without space
+                    currentMergedPara = currentMergedPara.trim().slice(0, -1) + trimmedLine;
+                } else {
+                    // Standard join with space
+                    currentMergedPara += " " + trimmedLine;
+                }
             }
         });
 
@@ -360,7 +374,7 @@ convertBtn.addEventListener('click', async () => {
         if (typeof pdfjsLib === 'undefined') throw new Error('PDF 라이브러리가 로드되지 않았습니다.');
         const docxLib = window.docx || (typeof docx !== 'undefined' ? docx : null);
         if (!docxLib) throw new Error('Word 라이브러리를 찾을 수 없습니다.');
-        const { Document, Packer, Paragraph, TextRun, ColumnBreak } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
+        const { Document, Packer, Paragraph, TextRun, ColumnBreak, PageBreak } = docxLib.Document ? docxLib : (docxLib.default || docxLib);
 
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer, signal: abortController.signal }).promise;
         const totalPages = pdf.numPages;
@@ -407,6 +421,10 @@ convertBtn.addEventListener('click', async () => {
                             spacing: { before: 200, after: 200 }
                         }));
                     });
+                    // Add PageBreak between columns in OCR mode too
+                    if (columns.indexOf(col) === 0) {
+                        pageParas.push(new Paragraph({ children: [new PageBreak()] }));
+                    }
                 }
                 docSections.push({ 
                     properties: { page: { margin: NARROW_MARGINS } },
@@ -422,7 +440,7 @@ convertBtn.addEventListener('click', async () => {
                 statusText.textContent = `스마트 문제 추출 중 (${i} / ${totalPages})...`;
                 progressBar.style.width = `${(i / totalPages) * 90}%`;
                 const page = await pdf.getPage(i);
-                const paras = await extractQuestionBlocks(page, { Paragraph, TextRun });
+                const paras = await extractQuestionBlocks(page, { Paragraph, TextRun, PageBreak });
                 if (paras.length > 0) {
                     totalQuestions += (paras.length / 2); // Roughly
                     docSections.push({ 
