@@ -271,6 +271,29 @@
         .sub-items label {
             font-size: 1.0rem !important; /* Larger text for readability */
         }
+
+        /* Mobile Layout Support */
+        .selection-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            gap: 15px;
+        }
+
+        @media (max-width: 640px) {
+            .selection-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .selection-header button {
+                width: 100%;
+                text-align: center;
+                transform: none !important;
+                margin-top: 5px;
+            }
+        }
     </style>
 </head>
 <body style="background: var(--bg-color);">
