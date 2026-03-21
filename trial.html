@@ -68,6 +68,46 @@
             box-shadow: var(--shadow-lg);
             border-color: transparent;
         }
+
+        /* Search Section Tweaks */
+        .search-hero {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .search-box-large {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .search-input-large {
+            flex: 1;
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-input-large:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-search-large {
+            padding: 0 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body style="background: var(--bg-color);">
@@ -88,22 +128,46 @@
     <section class="features-section" style="padding-top: 150px; min-height: 100vh;">
         <div class="container">
             <div class="section-header text-center">
-
                 <h2 class="section-title">자료실</h2>
-                <p class="section-desc">제스트 영어 은행의 학습 자료와 문제들을 다운로드 받으실 수 있습니다.</p>
+                <p class="section-desc">제스트 영어 은행의 최신 학습 자료를 검색하고 다운로드하세요.</p>
             </div>
             
-            <div class="trial-page-grid">
-                <a href="board.html?category=Vocabulary" class="trial-page-btn">어휘</a>
-                <a href="board.html?category=School" class="trial-page-btn">내신정복</a>
-                <a href="board.html?category=Mistakes" class="trial-page-btn">최다오답15</a>
-                <a href="board.html?category=Mock" class="trial-page-btn">모의고사</a>
-                <a href="board.html?category=Middle" class="trial-page-btn">중등교과서</a>
-                <a href="board.html?category=High" class="trial-page-btn">고등교과서</a>
-                <a href="converter_select.html" class="trial-page-btn" style="color: var(--primary);">PDF 변환</a>
+            <div class="search-hero glass-card">
+                <h3 style="font-size: 1.8rem; margin-bottom: 10px; color: var(--text-main);">교재 및 자료 검색</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">공식 교재 및 분야별 맞춤형 자료를 한눈에 찾아보실 수 있습니다.</p>
+                
+                <div class="search-box-large">
+                    <input type="text" id="searchInput" placeholder="교재 이름이나 검색어를 입력하세요..." class="search-input-large">
+                    <button id="searchBtn" class="btn btn-gradient btn-search-large">검색</button>
+                </div>
             </div>
         </div>
     </section>
+
+    <!-- Search Results Modal -->
+    <div class="modal-overlay" id="searchResultsModal">
+        <div class="glass-modal modal-wide">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>자료 검색 결과</h2>
+                <p id="searchCount">자료실에서 검색된 내역입니다.</p>
+            </div>
+            <div class="search-results-container">
+                <table class="board-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">번호</th>
+                            <th width="60%">제목</th>
+                            <th width="30%">다운로드</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchResultsContent">
+                        <!-- Results will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <!-- Modals (Hidden by default) -->
     <div class="modal-overlay" id="loginModal">
@@ -147,33 +211,5 @@
     </div>
 
     <script type="module" src="app.js"></script>
-    <script type="module">
-        import { supabase } from './supabaseClient.js';
-        
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            const loginModal = document.getElementById('loginModal');
-            
-            const trialBtns = document.querySelectorAll('.trial-page-btn');
-            trialBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (!session) {
-                        e.preventDefault();
-                        if (loginModal) loginModal.classList.add('active');
-                    }
-                });
-            });
-
-            const manualLink = document.querySelector('a[href*="category=Manual"]');
-            if (manualLink) {
-                manualLink.addEventListener('click', (e) => {
-                    if (!session) {
-                        e.preventDefault();
-                        if (loginModal) loginModal.classList.add('active');
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
