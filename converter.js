@@ -191,11 +191,10 @@ async function extractQuestionBlocks(page, docxComponents) {
     
     if (items.length === 0) return [];
 
-    // --- Dynamic Column Detection (Density-based) ---
-    // Filter out items that are likely headers/footers or full-width spans
+    // --- Dynamic Column Detection (Broad Density-based) ---
     const colItems = items.filter(it => {
         const y = it.transform[5];
-        return y < viewport.height * 0.9 && y > viewport.height * 0.1 && it.width < viewport.width * 0.6;
+        return y < viewport.height * 0.85 && y > viewport.height * 0.15 && it.width < viewport.width * 0.7;
     });
 
     const shadowArr = new Int32Array(Math.ceil(viewport.width));
@@ -205,31 +204,49 @@ async function extractQuestionBlocks(page, docxComponents) {
         for (let x = xStart; x <= xEnd; x++) shadowArr[x]++;
     });
 
-    // Find the X in the center 40-60% with the LOWEST density (ideally 0)
-    const minCenter = Math.floor(viewport.width * 0.4);
-    const maxCenter = Math.floor(viewport.width * 0.6);
-    let minDensity = Infinity;
+    const searchMin = Math.floor(viewport.width * 0.2);
+    const searchMax = Math.floor(viewport.width * 0.8);
     let bestX = viewport.width / 2;
+    let maxGutterWidth = 0;
+    let currentGutterStart = -1;
 
-    for (let x = minCenter; x <= maxCenter; x++) {
-        if (shadowArr[x] < minDensity) {
-            minDensity = shadowArr[x];
-            bestX = x;
-        } else if (shadowArr[x] === minDensity) {
-            // If tied, pick the one closer to the absolute center
-            if (Math.abs(x - viewport.width / 2) < Math.abs(bestX - viewport.width / 2)) {
+    for (let x = searchMin; x <= searchMax; x++) {
+        if (shadowArr[x] === 0) {
+            if (currentGutterStart === -1) currentGutterStart = x;
+        } else {
+            if (currentGutterStart !== -1) {
+                const width = x - currentGutterStart;
+                if (width > maxGutterWidth) {
+                    maxGutterWidth = width;
+                    bestX = currentGutterStart + (width / 2);
+                }
+                currentGutterStart = -1;
+            }
+        }
+    }
+
+    if (maxGutterWidth < 10) {
+        let minDensity = Infinity;
+        for (let x = searchMin; x <= searchMax; x++) {
+            if (shadowArr[x] < minDensity) {
+                minDensity = shadowArr[x];
                 bestX = x;
+            } else if (shadowArr[x] === minDensity) {
+                if (Math.abs(x - viewport.width / 2) < Math.abs(bestX - viewport.width / 2)) {
+                    bestX = x;
+                }
             }
         }
     }
 
     const midX = bestX;
+    const leftItems = items.filter(it => it.transform[4] < midX);
+    const rightItems = items.filter(it => it.transform[4] >= midX);
 
     const leftParas = getBlocksFromItems(leftItems, viewport.height, docxComponents);
     const rightParas = getBlocksFromItems(rightItems, viewport.height, docxComponents);
     const { Paragraph, PageBreak } = docxComponents;
 
-    // Sequential output: Left first, then a PageBreak, then Right.
     if (leftParas.length > 0 && rightParas.length > 0) {
         return [...leftParas, new Paragraph({ children: [new PageBreak()] }), ...rightParas];
     }
