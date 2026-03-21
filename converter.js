@@ -191,55 +191,52 @@ async function extractQuestionBlocks(page, docxComponents) {
     
     if (items.length === 0) return [];
 
-    // --- Dynamic Column Detection (Broad Density-based) ---
-    const colItems = items.filter(it => {
-        const y = it.transform[5];
-        return y < viewport.height * 0.85 && y > viewport.height * 0.15 && it.width < viewport.width * 0.7;
+    // --- Dynamic Column Detection (Peak Alignment) ---
+    const xFreq = {};
+    const searchMin = Math.floor(viewport.width * 0.15);
+    const searchMax = Math.floor(viewport.width * 0.85);
+
+    items.forEach(it => {
+        const x = Math.round(it.transform[4] / 10) * 10; // Bucket by 10px
+        if (x < searchMin || x > searchMax) return;
+        xFreq[x] = (xFreq[x] || 0) + 1;
     });
 
-    const shadowArr = new Int32Array(Math.ceil(viewport.width));
-    colItems.forEach(it => {
-        const xStart = Math.max(0, Math.floor(it.transform[4]));
-        const xEnd = Math.min(shadowArr.length - 1, Math.ceil(it.transform[4] + (it.width || 0)));
-        for (let x = xStart; x <= xEnd; x++) shadowArr[x]++;
-    });
+    // Find the two highest peaks that are sufficiently far apart
+    const sortedX = Object.keys(xFreq).sort((a, b) => xFreq[b] - xFreq[a]);
+    let peakLeft = -1;
+    let peakRight = -1;
 
-    const searchMin = Math.floor(viewport.width * 0.2);
-    const searchMax = Math.floor(viewport.width * 0.8);
-    let bestX = viewport.width / 2;
-    let maxGutterWidth = 0;
-    let currentGutterStart = -1;
-
-    for (let x = searchMin; x <= searchMax; x++) {
-        if (shadowArr[x] === 0) {
-            if (currentGutterStart === -1) currentGutterStart = x;
-        } else {
-            if (currentGutterStart !== -1) {
-                const width = x - currentGutterStart;
-                if (width > maxGutterWidth) {
-                    maxGutterWidth = width;
-                    bestX = currentGutterStart + (width / 2);
-                }
-                currentGutterStart = -1;
-            }
+    for (const xStr of sortedX) {
+        const x = parseInt(xStr);
+        if (peakLeft === -1) {
+            peakLeft = x;
+        } else if (Math.abs(x - peakLeft) > viewport.width * 0.25) {
+            peakRight = x;
+            break;
         }
     }
 
-    if (maxGutterWidth < 10) {
+    let midX = viewport.width / 2;
+    if (peakLeft !== -1 && peakRight !== -1) {
+        midX = (peakLeft + peakRight) / 2;
+    } else {
+        // Fallback to previous density method if peaks aren't clear
+        const shadowArr = new Int32Array(Math.ceil(viewport.width));
+        items.forEach(it => {
+            const xStart = Math.max(0, Math.floor(it.transform[4]));
+            const xEnd = Math.min(shadowArr.length - 1, Math.ceil(it.transform[4] + (it.width || 0)));
+            for (let xi = xStart; xi <= xEnd; xi++) shadowArr[xi]++;
+        });
+        
         let minDensity = Infinity;
-        for (let x = searchMin; x <= searchMax; x++) {
-            if (shadowArr[x] < minDensity) {
-                minDensity = shadowArr[x];
-                bestX = x;
-            } else if (shadowArr[x] === minDensity) {
-                if (Math.abs(x - viewport.width / 2) < Math.abs(bestX - viewport.width / 2)) {
-                    bestX = x;
-                }
+        for (let xi = Math.floor(viewport.width * 0.3); xi <= Math.floor(viewport.width * 0.7); xi++) {
+            if (shadowArr[xi] < minDensity) {
+                minDensity = shadowArr[xi];
+                midX = xi;
             }
         }
     }
-
-    const midX = bestX;
     const leftItems = items.filter(it => it.transform[4] < midX);
     const rightItems = items.filter(it => it.transform[4] >= midX);
 
