@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>제스트 - PDF 파일 편집하기</title>
+    <title>제스트 - PDF 파일 편집도구</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- PDF-Lib for local processing & PDF.js for rendering previews -->
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script>
-        (function() {
+        (function () {
             try {
                 const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
                 if (sessionStr) {
@@ -25,7 +27,7 @@
                         document.documentElement.classList.add('logged-in');
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
     <script type="module">
@@ -92,8 +94,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .drop-zone {
@@ -110,7 +119,10 @@
             margin-top: 15px;
         }
 
-        .drop-zone:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.05); }
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.05);
+        }
 
         .file-list {
             margin-top: 20px;
@@ -130,7 +142,9 @@
             transition: background 0.2s;
         }
 
-        .file-item:last-child { border-bottom: none; }
+        .file-item:last-child {
+            border-bottom: none;
+        }
 
         .file-item.dragging {
             opacity: 0.5;
@@ -146,7 +160,9 @@
             user-select: none;
         }
 
-        .drag-handle:active { cursor: grabbing; }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
 
         .delete-btn {
             color: #ef4444;
@@ -387,12 +403,18 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="container nav-container">
             <a href="index.html" class="brand-logo">
                 <span class="zest-brand">ZEST ENGLISH BANK</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="home-icon" style="margin-left: 4px; vertical-align: middle;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="home-icon" style="margin-left: 4px; vertical-align: middle;">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
             </a>
             <nav class="main-nav">
                 <div class="header-actions">
@@ -406,7 +428,7 @@
         <div class="container">
             <div class="editor-container">
                 <div id="gridHeader" class="section-header text-center">
-                    <h2 class="section-title">PDF <span class="text-orange">파일 편집하기</span></h2>
+                    <h2 class="section-title">PDF <span class="text-orange">파일 편집도구</span></h2>
                     <p class="section-desc">회전, 합치기, 나누기 등 필요한 작업을 로컬에서 안전하게 처리하세요.</p>
                 </div>
 
@@ -431,7 +453,7 @@
                 <!-- Tool Areas -->
                 <div id="toolArea" style="display: none;">
                     <div class="btn-back-grid" onclick="showGrid()">← 다른 도구 선택하기</div>
-                    
+
                     <!-- Rotate Tool -->
                     <div id="rotateArea" class="active-tool-area">
                         <div class="glass-card" style="padding: 30px;">
@@ -443,7 +465,7 @@
                             </div>
                             <div id="rotateInfo" class="control-panel" style="display: none;">
                                 <p><strong>선택된 파일:</strong> <span id="rotateFileName"></span></p>
-                                
+
                                 <div class="preview-box">
                                     <canvas id="rotateCanvas"></canvas>
                                 </div>
@@ -470,7 +492,8 @@
                                     </div>
                                     <input type="hidden" id="rotateAngle" value="0">
                                 </div>
-                                <button id="runRotateBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px;">회전 후 저장하기 💾</button>
+                                <button id="runRotateBtn" class="btn btn-gradient"
+                                    style="width: 100%; margin-top: 20px;">회전 후 저장하기 💾</button>
                             </div>
                         </div>
                     </div>
@@ -482,10 +505,12 @@
                             <div class="drop-zone" onclick="document.getElementById('mergeFiles').click()">
                                 <span style="font-size: 2rem;">🔗</span>
                                 <p style="font-weight: 600; margin-top: 10px;">파일들을 추가하세요.</p>
-                                <input type="file" id="mergeFiles" multiple accept="application/pdf" style="display: none">
+                                <input type="file" id="mergeFiles" multiple accept="application/pdf"
+                                    style="display: none">
                             </div>
                             <div id="mergeFileList" class="file-list" style="display: none;"></div>
-                            <button id="runMergeBtn" class="btn btn-gradient" style="width: 100%; margin-top: 20px; display: none;">합치기 시작 🚀</button>
+                            <button id="runMergeBtn" class="btn btn-gradient"
+                                style="width: 100%; margin-top: 20px; display: none;">합치기 시작 🚀</button>
                         </div>
                     </div>
 
@@ -498,9 +523,9 @@
                                 <p style="font-weight: 600; margin-top: 10px;">나눌 파일을 선택하세요.</p>
                                 <input type="file" id="splitFile" accept="application/pdf" style="display: none">
                             </div>
-                             <div id="splitInfo" class="control-panel" style="display: none;">
+                            <div id="splitInfo" class="control-panel" style="display: none;">
                                 <p><strong>선택된 파일:</strong> <span id="splitFileName"></span></p>
-                                
+
                                 <div class="visual-split-container">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <label style="font-weight: 700;">페이지 선택 (미리보기)</label>
@@ -508,22 +533,26 @@
                                             클릭하여 페이지 선택 / Shift+클릭으로 범위 선택
                                         </div>
                                     </div>
-                                    
+
                                     <div id="thumbnailGrid" class="thumbnail-grid">
                                         <!-- Thumbnails will be rendered here -->
-                                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                                        <div
+                                            style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
                                             페이지를 불러오는 중...
                                         </div>
                                     </div>
 
                                     <div class="split-controls">
                                         <div class="action-bar">
-                                            <button id="addRangeBtn" class="btn btn-outline btn-small" style="flex: 1;">선택한 페이지를 새 파일로 추가 +</button>
-                                            <button id="clearSelectionBtn" class="btn btn-outline btn-small">선택 해제</button>
+                                            <button id="addRangeBtn" class="btn btn-outline btn-small"
+                                                style="flex: 1;">선택한 페이지를 새 파일로 추가 +</button>
+                                            <button id="clearSelectionBtn" class="btn btn-outline btn-small">선택
+                                                해제</button>
                                         </div>
 
                                         <div id="rangeManager" style="display: none; margin-top: 10px;">
-                                            <label style="font-weight: 700; display: block; margin-bottom: 8px;">생성될 파일 목록</label>
+                                            <label style="font-weight: 700; display: block; margin-bottom: 8px;">생성될 파일
+                                                목록</label>
                                             <div id="rangeList" class="range-list">
                                                 <!-- Ranges will appear here -->
                                             </div>
@@ -531,11 +560,13 @@
                                     </div>
                                 </div>
 
-                                <button id="runSplitBtn" class="btn btn-gradient" style="width: 100%; margin-top: 25px; display: none;">분할 및 다운로드 시작 🚀</button>
-                                
+                                <button id="runSplitBtn" class="btn btn-gradient"
+                                    style="width: 100%; margin-top: 25px; display: none;">분할 및 다운로드 시작 🚀</button>
+
                                 <div id="oldSplitInput" style="display: none; margin-top: 15px;">
                                     <label>추출할 페이지 범위 (예: 1, 3-5):</label>
-                                    <input type="text" id="splitRange" class="input-inline" placeholder="공백 시 전체 페이지를 각각 분할">
+                                    <input type="text" id="splitRange" class="input-inline"
+                                        placeholder="공백 시 전체 페이지를 각각 분할">
                                 </div>
                             </div>
                         </div>
@@ -554,14 +585,14 @@
         async function getThumbnailUrl(file) {
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 const page = await pdf.getPage(1);
-                const viewport = page.getViewport({scale: 0.2}); // Low scale for thumbnails
+                const viewport = page.getViewport({ scale: 0.2 }); // Low scale for thumbnails
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                await page.render({canvasContext: context, viewport}).promise;
+                await page.render({ canvasContext: context, viewport }).promise;
                 return canvas.toDataURL();
             } catch (e) { return ''; }
         }
@@ -569,13 +600,13 @@
         async function renderLargePreview(file, canvas) {
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 const page = await pdf.getPage(1);
-                const viewport = page.getViewport({scale: 0.8});
+                const viewport = page.getViewport({ scale: 0.8 });
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
                 const context = canvas.getContext('2d');
-                await page.render({canvasContext: context, viewport}).promise;
+                await page.render({ canvasContext: context, viewport }).promise;
             } catch (e) { console.error('Preview error:', e); }
         }
 
@@ -583,7 +614,7 @@
             document.getElementById('gridHeader').style.display = 'none';
             document.getElementById('toolGrid').style.display = 'none';
             document.getElementById('toolArea').style.display = 'block';
-            
+
             // Hide all areas and show selected
             ['rotate', 'merge', 'split'].forEach(t => {
                 document.getElementById(t + 'Area').style.display = t === tool ? 'block' : 'none';
@@ -650,7 +681,7 @@
                 const angle = parseInt(btn.getAttribute('data-angle'));
                 rotateBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                
+
                 rotateAngleInput.value = angle;
                 rotateCanvas.style.transform = `rotate(${angle}deg)`;
             });
@@ -660,7 +691,7 @@
             if (!selectedRotateFile) return;
             const angle = parseInt(rotateAngleInput.value);
             if (angle === 0 && !confirm('0도(회전 없음) 상태입니다. 그대로 저장하시겠습니까?')) return;
-            
+
             const btn = document.getElementById('runRotateBtn');
             try {
                 btn.disabled = true; btn.textContent = '처리 중...';
@@ -705,7 +736,7 @@
                     <div style="display: flex; align-items: center;">
                         <span class="drag-handle">☰</span>
                         <img src="${item.thumbnail}" class="thumbnail-mini">
-                        <span>${i+1}. ${item.file.name}</span>
+                        <span>${i + 1}. ${item.file.name}</span>
                     </div>
                     <span class="delete-btn" onclick="removeMergeFile(${i})">삭제</span>
                 </div>
@@ -785,7 +816,7 @@
             if (selectedSplitFile) {
                 document.getElementById('splitInfo').style.display = 'block';
                 document.getElementById('splitFileName').textContent = selectedSplitFile.name;
-                
+
                 // Clear previous state
                 splitRanges = [];
                 updateRangeListUI();
@@ -796,22 +827,22 @@
         async function renderSplitThumbnails(file) {
             const grid = document.getElementById('thumbnailGrid');
             grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">미리보기를 생성 중입니다...</div>';
-            
+
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 const totalPages = pdf.numPages;
-                
+
                 grid.innerHTML = '';
                 for (let i = 1; i <= totalPages; i++) {
                     const page = await pdf.getPage(i);
-                    const viewport = page.getViewport({scale: 0.3});
+                    const viewport = page.getViewport({ scale: 0.3 });
                     const canvas = document.createElement('canvas');
                     const context = canvas.getContext('2d');
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
-                    await page.render({canvasContext: context, viewport}).promise;
-                    
+                    await page.render({ canvasContext: context, viewport }).promise;
+
                     const card = document.createElement('div');
                     card.className = 'page-card';
                     card.dataset.index = i - 1;
@@ -819,7 +850,7 @@
                         <img src="${canvas.toDataURL()}" class="page-thumb-img">
                         <div class="page-label">Page ${i}</div>
                     `;
-                    
+
                     card.addEventListener('click', (e) => handlePageClick(e, i - 1));
                     grid.appendChild(card);
                 }
@@ -830,7 +861,7 @@
 
         function handlePageClick(e, idx) {
             const cards = document.querySelectorAll('.page-card');
-            
+
             if (e.shiftKey && lastSelectedIdx !== null) {
                 // Range Selection
                 const start = Math.min(lastSelectedIdx, idx);
@@ -853,14 +884,14 @@
         document.getElementById('addRangeBtn').addEventListener('click', () => {
             const selectedCards = document.querySelectorAll('.page-card.selected');
             if (selectedCards.length === 0) return alert('페이지를 먼저 선택해 주세요.');
-            
+
             const indices = Array.from(selectedCards).map(c => parseInt(c.dataset.index)).sort((a, b) => a - b);
             splitRanges.push(indices);
-            
+
             // Unselect all after adding
             document.querySelectorAll('.page-card.selected').forEach(c => c.classList.remove('selected'));
             lastSelectedIdx = null;
-            
+
             updateRangeListUI();
         });
 
@@ -868,17 +899,17 @@
             const manager = document.getElementById('rangeManager');
             const list = document.getElementById('rangeList');
             const runBtn = document.getElementById('runSplitBtn');
-            
+
             if (splitRanges.length === 0) {
                 manager.style.display = 'none';
                 runBtn.style.display = 'none';
                 return;
             }
-            
+
             manager.style.display = 'block';
             runBtn.style.display = 'block';
             runBtn.textContent = `${splitRanges.length}개 파일로 분할 및 다운로드 🚀`;
-            
+
             list.innerHTML = splitRanges.map((range, i) => {
                 const pageDisplay = range.length === 1 ? `${range[0] + 1}` : `${range[0] + 1} ~ ${range[range.length - 1] + 1}`;
                 return `
@@ -903,33 +934,34 @@
             const btn = document.getElementById('runSplitBtn');
             try {
                 btn.disabled = true; btn.textContent = 'PDF 처리 중...';
-                
+
                 const bytes = await selectedSplitFile.arrayBuffer();
                 const sourcePdf = await PDFDocument.load(bytes);
-                
+
                 for (let i = 0; i < splitRanges.length; i++) {
                     const indices = splitRanges[i];
                     const newPdf = await PDFDocument.create();
                     const copiedPages = await newPdf.copyPages(sourcePdf, indices);
                     copiedPages.forEach(p => newPdf.addPage(p));
                     const splitBytes = await newPdf.save();
-                    
+
                     const suffix = splitRanges.length > 1 ? `_part${i + 1}` : '_split';
                     saveAs(new Blob([splitBytes]), selectedSplitFile.name.replace('.pdf', `${suffix}.pdf`));
-                    
+
                     // Small delay to prevent browser download blocking
                     if (splitRanges.length > 1) await new Promise(r => setTimeout(r, 300));
                 }
-                
+
                 alert('모든 파일이 생성되었습니다.');
-            } catch (err) { 
-                alert('오류: ' + err.message); 
-            } finally { 
-                btn.disabled = false; 
-                updateRangeListUI(); 
+            } catch (err) {
+                alert('오류: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                updateRangeListUI();
             }
         });
     </script>
     <script type="module" src="app.js"></script>
 </body>
+
 </html>

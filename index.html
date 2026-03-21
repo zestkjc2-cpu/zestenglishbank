@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <!-- v1.1.2 -->
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -21,7 +22,7 @@
 
     <!-- Fast-path session check to prevent color flash -->
     <script>
-        (function() {
+        (function () {
             try {
                 const sessionStr = localStorage.getItem('sb-kdyjvqjzmbknfntmgiqr-auth-token');
                 if (sessionStr) {
@@ -30,17 +31,19 @@
                         document.documentElement.classList.add('logged-in');
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
 
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
     <!-- Header Navigation -->
@@ -49,7 +52,7 @@
             <a href="index.html" class="brand-logo">
                 <span class="zest-brand">ZEST ENGLISH BANK</span>
             </a>
-            
+
             <nav class="main-nav">
                 <div class="header-actions">
                     <a href="board.html?category=Manual" class="nav-link gray-btn">사용안내</a>
@@ -72,9 +75,10 @@
         <div class="container hero-container">
             <div class="hero-content">
                 <div class="badge">혁신적인 학습 플랫폼</div>
-                <h1 class="hero-title"><span class="silver-text">가장 효율적인 영어 문제은행</span><br><span class="highlight">제스트 잉글리시 뱅크</span></h1>
+                <h1 class="hero-title"><span class="silver-text">가장 효율적인 영어 문제은행</span><br><span class="highlight">제스트
+                        잉글리시 뱅크</span></h1>
                 <p class="hero-subtitle">중등, 고등 내신과 수능의 효율적인 성적향상을 위한 가장 효과적인 자료를 제공합니다.</p>
-                
+
                 <!-- Notice Ticker -->
                 <div class="notice-ticker-container">
                     <div class="ticker-label">공지사항</div>
@@ -89,23 +93,29 @@
                 </div>
 
                 <div class="hero-actions">
-                     <button class="btn btn-large auth-dynamic-btn" id="entryLoginBtn">로그인 <span>👤</span></button>
-                     <a href="trial.html" class="btn btn-large gray-btn" id="entryFreeBtn">자료실 입장하기 <span>📁</span></a>
-                     <a href="question_gen.html" class="btn btn-large gray-btn" id="questionGenBtn">내신 변형문제 만들기 <span>✍️</span></a>
-                     <a href="#" class="btn btn-large gray-btn" id="workbookBtn">워크북 만들기 <span>📘</span></a>
-                     <a href="converter_select.html" class="btn btn-large gray-btn" id="converterBtn">PDF 파일 변환하기 <span>🔄</span></a>
-                     <a href="#" class="btn btn-large gray-btn" id="pdfEditBtn">PDF 파일 편집하기 <span>📝</span></a>
+                    <button class="btn btn-large auth-dynamic-btn" id="entryLoginBtn">로그인 <span>👤</span></button>
+                    <a href="trial.html" class="btn btn-large gray-btn" id="entryFreeBtn">자료실 입장하기 <span>📁</span></a>
+                    <a href="question_gen.html" class="btn btn-large gray-btn" id="questionGenBtn">내신 변형문제 만들기
+                        <span>✍️</span></a>
+                    <a href="#" class="btn btn-large gray-btn" id="workbookBtn">워크북 만들기 <span>📘</span></a>
+                    <a href="converter_select.html" class="btn btn-large gray-btn" id="converterBtn">PDF 파일 변환하기
+                        <span>🔄</span></a>
+                    <a href="#" class="btn btn-large gray-btn" id="pdfEditBtn">PDF 파일 편집도구 <span>📝</span></a>
                 </div>
             </div>
-            
+
             <div class="hero-image-wrapper">
-                <div class="glass-card main-showcase search-box-container" style="padding: 60px 40px; border-radius: 16px; background-color: rgba(241, 245, 249, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); text-align: center; box-shadow: var(--shadow-xl); position: relative; overflow: hidden;">
-                    
+                <div class="glass-card main-showcase search-box-container"
+                    style="padding: 60px 40px; border-radius: 16px; background-color: rgba(241, 245, 249, 0.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); text-align: center; box-shadow: var(--shadow-xl); position: relative; overflow: hidden;">
+
                     <div style="position: relative; z-index: 2;">
                         <h3 style="margin-bottom: 25px; font-size: 1.7rem; color: var(--text-main);">영어 자료 검색</h3>
-                        <div class="flex-container" style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 450px; margin: 0 auto; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-                            <input type="text" id="searchInput" placeholder="검색어를 입력하세요..." class="image-search-input" style="flex: 1 1 200px; min-width: 0; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <button id="searchBtn" class="btn auth-dynamic-btn search-btn" style="flex: 0 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.15); white-space: nowrap;">검색</button>
+                        <div class="flex-container"
+                            style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 450px; margin: 0 auto; background: rgba(255,255,255,0.8); padding: 8px; border-radius: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                            <input type="text" id="searchInput" placeholder="검색어를 입력하세요..." class="image-search-input"
+                                style="flex: 1 1 200px; min-width: 0; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                            <button id="searchBtn" class="btn auth-dynamic-btn search-btn"
+                                style="flex: 0 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.15); white-space: nowrap;">검색</button>
                         </div>
                     </div>
                 </div>
@@ -120,10 +130,11 @@
     <section class="features-section">
         <div class="container">
             <div class="section-header text-center">
-                <h2 class="section-title">최적화된 <span class="text-orange">문제은행</span>과 <span class="text-orange">시중교재 연계</span> 서비스</h2>
+                <h2 class="section-title">최적화된 <span class="text-orange">문제은행</span>과 <span class="text-orange">시중교재
+                        연계</span> 서비스</h2>
                 <p class="section-desc">제스트는 간편하고 편리하게 여러분의 학습을 지원합니다.</p>
             </div>
-            
+
             <div class="features-grid">
                 <div class="feature-card glass-card">
                     <div class="feature-icon">📚</div>
@@ -163,7 +174,7 @@
                 </div>
                 <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
                 <button type="submit" class="btn btn-full auth-dynamic-btn" id="modalSubmitBtn">로그인</button>
-                
+
                 <div class="social-login-divider">
                     <span>또는</span>
                 </div>
@@ -179,7 +190,9 @@
                     </button>
                 </div>
                 <div style="margin-top: 20px; text-align: center;">
-                    <a href="admin.html" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자 로그인</a>
+                    <a href="admin.html"
+                        style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자
+                        로그인</a>
                 </div>
             </form>
         </div>
@@ -227,7 +240,7 @@
                     <span class="footer-info-value">2026-서울강남-3396</span>
                 </div>
             </div>
-            
+
             <div class="footer-info-row">
                 <div class="footer-info-item">
                     <span class="footer-info-label">사업장주소 :</span>
@@ -257,7 +270,7 @@
                         <a href="#" class="privacy-link">개인정보처리방침</a>
                     </div>
                 </div>
-                
+
                 <div class="social-icons">
                     <a href="#" class="social-icon-btn">f</a>
                     <a href="#" class="social-icon-btn">b</a>
@@ -271,4 +284,5 @@
     <!-- Scripts -->
     <script type="module" src="app.js"></script>
 </body>
+
 </html>
