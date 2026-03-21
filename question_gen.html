@@ -224,21 +224,11 @@
             transform: rotate(45deg);
         }
 
-        /* Sub-items Visibility Logic */
+        /* Sub-items Visibility (Always Visible) */
         .sub-items {
-            display: none; /* Hidden by default */
-            margin-top: 10px;
-            padding-left: 35px;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-        }
-
-        /* Show sub-items when main category is checked */
-        .category-group:has(.main-cat-check:checked) .sub-items {
             display: grid;
-            opacity: 1;
-            transform: translateY(0);
+            margin-top: 15px;
+            padding-left: 35px;
             gap: 12px;
         }
 
@@ -257,15 +247,14 @@
         }
 
         .category-header {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .category-group:has(.main-cat-check:checked) .category-header {
             margin-bottom: 15px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
+        }
+
+        .category-header strong {
+            font-size: 1.1rem;
+            color: var(--primary);
         }
 
         .sub-items label {
