@@ -99,8 +99,12 @@
             alert('관리자 로그인이 필요합니다.');
             window.location.href = 'admin.html';
         } else {
-            const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-            if (!profile || profile.role !== 'admin') {
+            let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
+            if (!isAdmin) {
+                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                if (profile && profile.role === 'admin') isAdmin = true;
+            }
+            if (!isAdmin) {
                 alert('관리자 권한이 없습니다.');
                 window.location.href = 'index.html';
             }

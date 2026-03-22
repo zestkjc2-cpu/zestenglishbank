@@ -123,8 +123,12 @@
         // Check if already logged in
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-            const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-            if (profile && profile.role === 'admin') {
+            let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
+            if (!isAdmin) {
+                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                if (profile && profile.role === 'admin') isAdmin = true;
+            }
+            if (isAdmin) {
                 showDashboardPanel(session.user.email);
             } else {
                 await supabase.auth.signOut();
@@ -148,8 +152,13 @@
             if (error) {
                 adminError.textContent = '로그인 실패: ' + error.message;
             } else {
-                const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
-                if (profile && profile.role === 'admin') {
+                let isAdmin = (data.user.email === 'zestkjc2@gmail.com');
+                if (!isAdmin) {
+                    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+                    if (profile && profile.role === 'admin') isAdmin = true;
+                }
+                
+                if (isAdmin) {
                     showDashboardPanel(data.session.user.email);
                 } else {
                     await supabase.auth.signOut();

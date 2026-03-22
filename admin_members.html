@@ -144,8 +144,12 @@ on conflict (id) do nothing;
             alert('관리자 로그인이 필요합니다.');
             window.location.href = 'admin.html';
         } else {
-            const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-            if (!profile || profile.role !== 'admin') {
+            let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
+            if (!isAdmin) {
+                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                if (profile && profile.role === 'admin') isAdmin = true;
+            }
+            if (!isAdmin) {
                 alert('관리자 권한이 없습니다.');
                 window.location.href = 'index.html';
             } else {
@@ -210,9 +214,16 @@ on conflict (id) do nothing;
             data.forEach((member, i) => {
                 const date = new Date(member.created_at).toLocaleDateString('ko-KR');
                 const nameStr = member.full_name || '-';
+                const isMasterAdmin = (member.email === 'zestkjc2@gmail.com');
+                
                 let roleStr = '⚪ 무료회원';
-                if (member.role === 'admin') roleStr = '🔴 관리자';
+                if (member.role === 'admin' || isMasterAdmin) roleStr = '🔴 관리자';
                 else if (member.role === 'paid') roleStr = '💎 유료회원';
+                
+                const btnHtml = isMasterAdmin ? 
+                    `<span style="color:#999;font-size:0.8rem;padding:4px 8px;">마스터</span>` : 
+                    `<button onclick="handleRoleUpdate('${member.id}', '${member.role || 'free'}')" class="btn" style="padding:4px 8px; font-size:0.8rem; border:1px solid var(--border);">변경</button>`;
+
                 const tr = document.createElement('tr');
 
                 tr.innerHTML = `
@@ -222,7 +233,7 @@ on conflict (id) do nothing;
                     <td>
                         <div style="display:flex; align-items:center; justify-content:center; gap:8px;">
                             <span>${roleStr}</span>
-                            <button onclick="handleRoleUpdate('${member.id}', '${member.role || 'user'}')" class="btn" style="padding:4px 8px; font-size:0.8rem; border:1px solid var(--border);">변경</button>
+                            ${btnHtml}
                         </div>
                     </td>
                     <td>${date}</td>
