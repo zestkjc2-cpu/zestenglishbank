@@ -263,6 +263,8 @@ function getBlocksFromItems(items, pageHeight, { Paragraph, TextRun }) {
     });
 
     if (filtered.length === 0) return [];
+    
+    const paras = [];
 
     // Grouping by Y-lines
     const lines = [];
