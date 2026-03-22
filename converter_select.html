@@ -34,12 +34,16 @@
             text-align: center;
         }
         .mode-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 30px;
         }
         .mode-card {
+            width: 100%;
+            max-width: 192px; /* Matches the exact width of a 3-column card in PDF Editor */
+            /* Ensure height matches width roughly to form a square */
+            min-height: 192px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 16px;
@@ -51,7 +55,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 12px;
+            position: relative;
         }
         .mode-card::before {
             content: '';
@@ -60,6 +66,7 @@
             background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(79, 70, 229, 0));
             opacity: 0;
             transition: opacity 0.3s ease;
+            border-radius: 16px;
         }
         .mode-card:hover {
             transform: translateY(-5px);
@@ -71,9 +78,7 @@
         }
         .mode-icon {
             font-size: 1.8rem;
-            background: var(--bg-color);
-            width: 50px;
-            height: 50px;
+            margin-bottom: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -95,20 +100,20 @@
         @media (max-width: 640px) {
             .select-container { padding: 20px 10px; }
             .mode-grid { 
-                grid-template-columns: repeat(2, 1fr); 
+                display: flex;
+                flex-direction: row; /* Keep them side by side if possible */
                 gap: 12px;
                 margin-top: 20px;
             }
             .mode-card {
-                padding: 24px 12px;
+                padding: 20px 12px;
                 border-radius: 16px;
                 gap: 12px;
+                min-height: 160px; /* slightly smaller on mobile */
+                max-width: 50%;
             }
             .mode-icon {
-                width: 50px;
-                height: 50px;
                 font-size: 2rem;
-                border-radius: 16px;
             }
             .mode-title {
                 font-size: 0.95rem;
@@ -116,10 +121,6 @@
             }
             .mode-desc {
                 display: none; /* Hide description on mobile to save space */
-            }
-            .mode-card .btn-outline {
-                padding: 6px 12px !important;
-                font-size: 0.8rem;
             }
         }
     </style>
