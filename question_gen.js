@@ -302,19 +302,53 @@ confirmAddBtn.addEventListener('click', () => {
 });
 
 function createMultipleChoiceQuestion(text, typeTitle) {
+    // Extract long words from text to form dynamic options
+    const words = text.match(/\b[a-zA-Z]{5,}\b/g) || ["learning", "concept", "education", "development", "process"];
+    const uniqueWords = [...new Set(words.map(w => w.toLowerCase()))];
+    uniqueWords.sort(() => 0.5 - Math.random());
+    
+    const fallbacks = ["system", "approach", "understanding", "analysis", "framework", "perspective", "evidence", "theory"];
+    while (uniqueWords.length < 10) uniqueWords.push(fallbacks.pop());
+
+    const templates = [
+        "The role of {0} in modern {1}",
+        "How {0} affects the {1}",
+        "Understanding the importance of {0}",
+        "The relationship between {0} and {1}",
+        "New perspectives on {0} development",
+        "The impact of {0} on our {1}",
+        "Why {0} matters in the context of {1}",
+        "Comparing {0} with traditional {1}",
+        "The hidden meaning behind {0}",
+        "Strategies for improving {0}"
+    ];
+    templates.sort(() => 0.5 - Math.random());
+
+    const generatedOptions = [];
+    for(let i = 0; i < 5; i++) {
+        let tpl = templates[i];
+        let w1 = uniqueWords[i * 2 % uniqueWords.length];
+        let w2 = uniqueWords[(i * 2 + 1) % uniqueWords.length];
+        let opt = tpl.replace("{0}", w1).replace("{1}", w2);
+        opt = opt.charAt(0).toUpperCase() + opt.slice(1);
+        generatedOptions.push(opt);
+    }
+    
+    const answerIndex = Math.floor(Math.random() * 5);
+    const answerLabels = ['①', '②', '③', '④', '⑤'];
+
+    let questionText = `다음 글의 제목이나 요지로 가장 적절한 것을 고르시오.`;
+    if (typeTitle.includes("빈칸") || typeTitle.includes("일치") || typeTitle.includes("추론") || typeTitle.includes("순서")) {
+        questionText = `다음 글에 대한 설명으로 가장 적절한 것을 고르시오.`;
+    }
+
     return {
         type: 'multiple',
         typeTitle: typeTitle,
-        question: `다음 글의 제목(또는 유형 목적)으로 가장 적절한 것을 고르시오.`,
-        passage: text, // Use full text
-        options: [
-            "Understanding the core concept of English education",
-            "The evolution of artificial intelligence in learning",
-            "Innovative strategies for teaching language skills",
-            "Balancing tradition and technology in classrooms",
-            "Future perspectives on global communication"
-        ],
-        answer: "①"
+        question: questionText,
+        passage: text,
+        options: generatedOptions,
+        answer: answerLabels[answerIndex]
     };
 }
 
@@ -370,12 +404,15 @@ function createOrderingQuestion(text, typeTitle) {
 }
 
 function createSubjectiveQuestion(text, typeTitle) {
+    const words = text.match(/\b[a-zA-Z]{5,}\b/g) || ["learning", "concept", "education", "development"];
+    const w1 = words[Math.floor(Math.random() * words.length)].toLowerCase();
+    
     return {
         type: 'subjective',
         typeTitle: typeTitle,
-        question: `다음 지문의 주제를 10단어 내외의 영어 문장으로 요약하여 서술하시오.`,
-        passage: text, // Use full text
-        answer: "The importance of continuous learning in the digital transformation age."
+        question: `다음 지문의 핵심 내용을 요약할 때, 본문에서 적절한 단어를 찾아 쓰시오.`,
+        passage: text,
+        answer: `The importance of ${w1} in this context.`
     };
 }
 
