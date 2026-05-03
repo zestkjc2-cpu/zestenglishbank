@@ -111,7 +111,7 @@
     </section>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { authService } from './src/services/apiService.js';
 
         const loginSection = document.getElementById('loginSection');
         const dashboardSection = document.getElementById('dashboardSection');
@@ -121,17 +121,17 @@
         const logoutBtn = document.getElementById('logoutBtn');
 
         // Check if already logged in
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await authService.getSession();
         if (session) {
             let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
             if (!isAdmin) {
-                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                const { data: profile } = await authService.getProfile(session.user.id);
                 if (profile && profile.role === 'admin') isAdmin = true;
             }
             if (isAdmin) {
                 showDashboardPanel(session.user.email);
             } else {
-                await supabase.auth.signOut();
+                await authService.signOut();
             }
         }
 
@@ -148,20 +148,20 @@
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await authService.signInWithPassword(email, password);
             if (error) {
                 adminError.textContent = '로그인 실패: ' + error.message;
             } else {
                 let isAdmin = (data.user.email === 'zestkjc2@gmail.com');
                 if (!isAdmin) {
-                    const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+                    const { data: profile } = await authService.getProfile(data.user.id);
                     if (profile && profile.role === 'admin') isAdmin = true;
                 }
                 
                 if (isAdmin) {
                     showDashboardPanel(data.session.user.email);
                 } else {
-                    await supabase.auth.signOut();
+                    await authService.signOut();
                     adminError.textContent = '로그인 실패: 관리자 권한이 없습니다.';
                 }
             }
@@ -169,7 +169,7 @@
 
         // Logout
         logoutBtn.addEventListener('click', async () => {
-            await supabase.auth.signOut();
+            await authService.signOut();
             dashboardSection.style.display = 'none';
             loginSection.style.display = 'block';
             welcomeMsg.textContent = '';

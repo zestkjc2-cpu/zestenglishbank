@@ -1,0 +1,25 @@
+{
+  "name": "zeb-prj",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zestkjc2-cpu/zestenglishbank.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/zestkjc2-cpu/zestenglishbank/issues"
+  },
+  "homepage": "https://github.com/zestkjc2-cpu/zestenglishbank#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1"
+  }
+}

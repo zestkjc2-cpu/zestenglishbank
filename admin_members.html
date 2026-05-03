@@ -136,17 +136,17 @@ on conflict (id) do nothing;
 
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { authService, adminService } from './src/services/apiService.js';
 
         // Check if admin is logged in
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await authService.getSession();
         if (!session) {
             alert('관리자 로그인이 필요합니다.');
             window.location.href = 'admin.html';
         } else {
             let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
             if (!isAdmin) {
-                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                const { data: profile } = await authService.getProfile(session.user.id);
                 if (profile && profile.role === 'admin') isAdmin = true;
             }
             if (!isAdmin) {
@@ -162,10 +162,7 @@ on conflict (id) do nothing;
             const setupGuide = document.getElementById('setupGuide');
             
             // Try formatting profiles table first
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .order('created_at', { ascending: false });
+            const { data, error } = await adminService.getMembers();
 
             window.handleRoleUpdate = async (userId, currentRole) => {
                 const nextRoleMap = {
@@ -181,10 +178,7 @@ on conflict (id) do nothing;
                 const confirmMsg = `해당 회원의 권한을 [${roleNames[newRole]}]로 변경하시겠습니까?`;
                 if (!confirm(confirmMsg)) return;
 
-                const { error } = await supabase
-                    .from('profiles')
-                    .update({ role: newRole })
-                    .eq('id', userId);
+                const { error } = await adminService.updateMemberRole(userId, newRole);
 
                 if (error) {
                     alert('권한 변경 실패: ' + error.message);

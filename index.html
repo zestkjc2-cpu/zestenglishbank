@@ -12,7 +12,7 @@
     <meta name="publisher" content="제스트" />
     <meta name="author" content="제스트" />
     <meta name="robots" content="영어 문제은행, 제스트" />
-    <meta name="keywords" content="제스트, 단어학습, 리딩, 보카, 파닉스, 영어 문제은행, 초등영어, 그래머" />
+    <meta name="keywords" content="제스트, 단어학습, 리딩, 보카, 영어 문제은행, 중/고등 영어 내신 수능 전문 사이트" />
     <meta name="description" content="문법 문제은행 - 제스트" />
     <meta property="og:title" content="제스트 영어 문제은행" />
     <meta property="og:site_name" content="제스트 영어 문제은행" />
@@ -46,29 +46,7 @@
 
 <body>
 
-    <!-- Header Navigation -->
-    <header class="header">
-        <div class="container nav-container">
-            <a href="index.html" class="brand-logo">
-                <span class="zest-brand">ZEST ENGLISH BANK</span>
-            </a>
-
-            <nav class="main-nav">
-                <div class="header-actions">
-                    <a href="board.html?category=Manual" class="nav-link gray-btn">사용안내</a>
-                    <a href="#" class="nav-link auth-dynamic-btn" id="loginBtn">Login</a>
-                </div>
-                <!-- Nav list can remain empty or contain other links if needed later, but we hide it for now -->
-                <ul class="nav-list" style="display:none;">
-                </ul>
-            </nav>
-            <button class="mobile-menu-btn" aria-label="Toggle Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
+    <!-- Header will be injected by Header.js component -->
 
     <!-- Main Hero Section -->
     <section class="hero-section">
@@ -93,13 +71,11 @@
                 </div>
 
                 <div class="hero-actions">
-                    <a href="trial.html" class="btn btn-large gray-btn" id="entryFreeBtn">자료실 입장하기 <span>📁</span></a>
-                    <a href="question_gen.html" class="btn btn-large gray-btn" id="questionGenBtn">내신 변형문제 만들기
-                        <span>✍️</span></a>
-                    <a href="#" class="btn btn-large gray-btn" id="workbookBtn">워크북 만들기 <span>📘</span></a>
-                    <a href="converter_select.html" class="btn btn-large gray-btn" id="converterBtn">PDF 파일 변환하기
-                        <span>🔄</span></a>
-                    <a href="#" class="btn btn-large gray-btn" id="pdfEditBtn">PDF 파일 편집도구 <span>📝</span></a>
+                    <a href="trial.html" class="btn btn-large gray-btn" id="entryFreeBtn"><span>📁</span>자료실 입장하기</a>
+                    <a href="question_gen.html" class="btn btn-large gray-btn" id="questionGenBtn"><span>✍️</span>내신 변형문제 만들기</a>
+                    <a href="#" class="btn btn-large gray-btn" id="workbookBtn"><span>📘</span>워크북 만들기</a>
+                    <a href="converter_select.html" class="btn btn-large gray-btn" id="converterBtn"><span>🔄</span>PDF 파일 변환하기</a>
+                    <a href="#" class="btn btn-large gray-btn" id="pdfEditBtn"><span>📝</span>PDF 파일 편집도구</a>
                 </div>
             </div>
 
@@ -154,48 +130,7 @@
         </div>
     </section>
 
-    <!-- Modals (Hidden by default) -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal-content glass-modal">
-            <button class="close-modal">×</button>
-            <div class="modal-header">
-                <h2>회원 로그인</h2>
-                <p>제스트 영어 문제은행에 오신 것을 환영합니다.</p>
-            </div>
-            <form class="login-form" id="loginForm">
-                <div class="input-group">
-                    <label>이메일</label>
-                    <input type="email" id="loginEmail" placeholder="email@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label>비밀번호</label>
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                </div>
-                <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
-                <button type="submit" class="btn btn-full auth-dynamic-btn" id="modalSubmitBtn">로그인</button>
-
-                <div class="social-login-divider">
-                    <span>또는</span>
-                </div>
-                <div class="social-login-actions">
-                    <button type="button" class="btn auth-dynamic-btn" id="signupZest">
-                        제스트 회원가입하기
-                    </button>
-                    <button type="button" class="btn btn-social btn-google" id="loginGoogle">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" class="social-icon"> 구글로 로그인하기
-                    </button>
-                    <button type="button" class="btn btn-social btn-naver" id="loginNaver">
-                        <img src="https://www.naver.com/favicon.ico" alt="Naver" class="social-icon"> 네이버로 로그인하기
-                    </button>
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <a href="admin.html"
-                        style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자
-                        로그인</a>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Login Modal will be injected by Modal.js component -->
 
     <!-- Search Results Modal -->
     <div class="modal-overlay" id="searchResultsModal">

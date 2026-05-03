@@ -9,8 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     <script type="module">
-        import { supabase } from './supabaseClient.js';
-        const { data: { session: authSession } } = await supabase.auth.getSession();
+        import { authService } from './src/services/apiService.js';
+        const { data: { session: authSession } } = await authService.getSession();
         if (!authSession) window.location.href = 'index.html?login=true';
     </script>
     <style>
@@ -91,17 +91,17 @@
     </section>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { authService } from './src/services/apiService.js';
         
         // Admin session check
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await authService.getSession();
         if (!session) {
             alert('관리자 로그인이 필요합니다.');
             window.location.href = 'admin.html';
         } else {
             let isAdmin = (session.user.email === 'zestkjc2@gmail.com');
             if (!isAdmin) {
-                const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+                const { data: profile } = await authService.getProfile(session.user.id);
                 if (profile && profile.role === 'admin') isAdmin = true;
             }
             if (!isAdmin) {

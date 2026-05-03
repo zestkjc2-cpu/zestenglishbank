@@ -22,11 +22,6 @@
             } catch (e) {}
         })();
     </script>
-    <script type="module">
-        import { supabase } from './supabaseClient.js';
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
-        if (!initialSession) window.location.href = 'index.html?login=true';
-    </script>
     <style>
         .trial-page-grid {
             display: grid;
@@ -71,24 +66,11 @@
     </style>
 </head>
 <body style="background: var(--bg-color);">
-    <header class="header">
-        <div class="container nav-container">
-            <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
-                <span class="zest-brand">ZEST ENGLISH BANK</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="home-icon"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </a>
-            <nav class="main-nav">
-                <div class="header-actions">
-                    <a href="#" class="nav-link primary-btn" id="loginBtn">Login</a>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <!-- Header injected by Header.js -->
 
     <section class="features-section" style="padding-top: 150px; min-height: 100vh;">
         <div class="container">
             <div class="section-header text-center">
-
                 <h2 class="section-title">자료실</h2>
                 <p class="section-desc">제스트 영어 은행의 학습 자료와 문제들을 다운로드 받으실 수 있습니다.</p>
             </div>
@@ -104,74 +86,25 @@
         </div>
     </section>
 
-    <!-- Modals (Hidden by default) -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal-content glass-modal">
-            <button class="close-modal">&times;</button>
-            <div class="modal-header">
-                <h2>회원 로그인</h2>
-                <p>제스트 영어 문제은행에 오신 것을 환영합니다.</p>
-            </div>
-            <form class="login-form" id="loginForm">
-                <div class="input-group">
-                    <label>이메일</label>
-                    <input type="email" id="loginEmail" placeholder="email@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label>비밀번호</label>
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                </div>
-                <p id="loginError" style="color:red;font-size:0.88rem;margin:4px 0 0 0;"></p>
-                <button type="submit" class="btn btn-gradient btn-full">로그인</button>
-                
-                <div class="social-login-divider">
-                    <span>또는</span>
-                </div>
-                <div class="social-login-actions">
-                    <button type="button" class="btn btn-social btn-zest" id="signupZest">
-                        제스트 회원가입하기
-                    </button>
-                    <button type="button" class="btn btn-social btn-google" id="loginGoogle">
-                        <img src="https://www.google.com/favicon.ico" alt="Google" class="social-icon"> 구글로 로그인하기
-                    </button>
-                    <button type="button" class="btn btn-social btn-naver" id="loginNaver">
-                        <img src="https://www.naver.com/favicon.ico" alt="Naver" class="social-icon"> 네이버로 가입하기
-                    </button>
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <a href="admin.html" style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-decoration: underline;">관리자 로그인</a>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- Login Modal injected by Modal.js -->
 
     <script type="module" src="app.js"></script>
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { authService } from './src/services/apiService.js';
         
         document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            const loginModal = document.getElementById('loginModal');
+            const { data: { session } } = await authService.getSession();
             
             const trialBtns = document.querySelectorAll('.trial-page-btn');
             trialBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     if (!session) {
                         e.preventDefault();
-                        if (loginModal) loginModal.classList.add('active');
+                        window.showZestAlert('로그인이 필요한 서비스입니다.');
+                        document.getElementById('loginModal').classList.add('active');
                     }
                 });
             });
-
-            const manualLink = document.querySelector('a[href*="category=Manual"]');
-            if (manualLink) {
-                manualLink.addEventListener('click', (e) => {
-                    if (!session) {
-                        e.preventDefault();
-                        if (loginModal) loginModal.classList.add('active');
-                    }
-                });
-            }
         });
     </script>
 </body>
