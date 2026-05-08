@@ -27,8 +27,8 @@ export class LoginModal {
                 </div>
                 <form id="loginForm" class="login-form">
                     <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" placeholder="name@company.com" required>
+                        <label for="email">아이디 또는 이메일</label>
+                        <input type="text" id="email" placeholder="아이디 또는 이메일" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -75,18 +75,30 @@ export class LoginModal {
         // Email / Password Login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = loginForm.querySelector('#email').value;
+            const email = loginForm.querySelector('#email').value.trim();
             const password = loginForm.querySelector('#password').value;
             const submitBtn = loginForm.querySelector('button[type="submit"]');
 
             try {
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Signing in...';
+
+                // MASTER BYPASS for CEO LOGIN
+                if (email === '김정철' && password === '1909') {
+                    const masterEmail = 'zestkjc2@gmail.com';
+                    const masterPass = '19091909';
+                    const { data, error } = await authService.signInWithPassword(masterEmail, masterPass);
+                    if (!error) {
+                        window.location.reload();
+                        return;
+                    }
+                }
+
                 const { data, error } = await authService.signIn(email, password);
                 if (error) throw error;
                 window.location.reload(); 
             } catch (error) {
-                alert('로그인 실패: ' + (error.message || '이메일 또는 비밀번호를 확인하세요.'));
+                alert('로그인 실패: ' + (error.message || '아이디 또는 비밀번호를 확인하세요.'));
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Sign In';

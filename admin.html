@@ -75,8 +75,8 @@
                 <div id="loginSection">
                     <form id="adminLoginForm" style="display:flex; flex-direction: column; gap: 14px; margin-top:20px;">
                         <div class="input-group">
-                            <label>이메일</label>
-                            <input type="email" id="adminEmail" placeholder="admin@example.com" required>
+                            <label>아이디 또는 이메일</label>
+                            <input type="text" id="adminEmail" placeholder="아이디 또는 이메일" required>
                         </div>
                         <div class="input-group">
                             <label>비밀번호</label>
@@ -138,7 +138,7 @@
         function showDashboardPanel(email) {
             loginSection.style.display = 'none';
             dashboardSection.style.display = 'block';
-            welcomeMsg.textContent = '✅ 환영합니다, 관리자님! (' + email + ')';
+            welcomeMsg.textContent = '✅ 환영합니다, 김정철 관리자님!';
         }
 
         // Admin Login
@@ -147,6 +147,23 @@
             adminError.textContent = '';
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
+
+            // MASTER BYPASS for CEO LOGIN
+            if (email === '김정철' && password === '1909') {
+                // We'll simulate a login or use a specific master account
+                // For now, we'll use a specific email that's already admin
+                const masterEmail = 'zestkjc2@gmail.com';
+                const masterPass = '19091909'; // This would need to be the actual password for that email in Supabase
+                
+                // If we don't want to use real Supabase for this specific bypass, 
+                // we can just force the UI state, but it's better to log in properly.
+                // Let's try proper login with mapped credentials first.
+                const { data, error } = await authService.signInWithPassword(masterEmail, masterPass);
+                if (!error) {
+                    showDashboardPanel('김정철');
+                    return;
+                }
+            }
 
             const { data, error } = await authService.signInWithPassword(email, password);
             if (error) {
