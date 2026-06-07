@@ -86,7 +86,7 @@ export class LoginModal {
                 // MASTER BYPASS for CEO LOGIN
                 if (email === '김정철' && password === '1909') {
                     const masterEmail = 'zestkjc2@gmail.com';
-                    const masterPass = '19091909';
+                    const masterPass = '1909';
                     const { data, error } = await authService.signInWithPassword(masterEmail, masterPass);
                     if (!error) {
                         window.location.reload();
@@ -94,7 +94,7 @@ export class LoginModal {
                     }
                 }
 
-                const { data, error } = await authService.signIn(email, password);
+                const { data, error } = await authService.signInWithPassword(email, password);
                 if (error) throw error;
                 window.location.reload(); 
             } catch (error) {
