@@ -1,7 +1,7 @@
 /**
  * Header.js
  * 
- * ZEST ENGLISH BANK common header component.
+ * ZEST EXAM MASTER common header component.
  * Handles dynamic rendering and auth state synchronization.
  */
 import { authService } from '../services/apiService.js';
@@ -24,7 +24,7 @@ export class Header {
         const headerHTML = `
             <div class="container nav-container">
                 <a href="index.html" class="brand-logo">
-                    <span class="zest-brand">ZEST ENGLISH BANK</span>
+                    <span class="zest-brand">ZEST EXAM MASTER</span>
                 </a>
 
                 <nav class="main-nav">

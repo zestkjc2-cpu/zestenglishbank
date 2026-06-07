@@ -1,7 +1,7 @@
 /**
  * Modal.js
  * 
- * ZEST ENGLISH BANK common modal component.
+ * ZEST EXAM MASTER common modal component.
  * Handles rendering and form submission for login and other popups.
  */
 import { authService } from '../services/apiService.js';
